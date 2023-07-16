@@ -12,7 +12,7 @@ class Application{
         configDataBase(DB_URL)
         configApplication(this.#app,this.#express)
         createServer(this.#app,PORT)
-        //createRoutes(this.#app)
+        createRoutes(this.#app)
         otherConfigs();
         errorHandler(this.#app)
     }

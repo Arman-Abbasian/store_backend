@@ -1,4 +1,5 @@
-//const { AllRoutes } = require("../router/index.routes")
+const { AllRoutes } = require("../router/router")
+
 
 function createRoutes(app){
    app.use(AllRoutes)
