@@ -1,23 +1,26 @@
 
 const createError = require("http-errors");
-//const { ROLES } = require("../../../../utils/constans");
-//const { RandomNumberGenerator, SignAccessToken, VerifyRefreshToken, SignRefreshToken, getBasketOfUser } = require("../../../../utils/functions");
+const { ROLES } = require("../../../utils/constans");
+//const {SignAccessToken, VerifyRefreshToken, SignRefreshToken, getBasketOfUser } = require("../../../utils/functions");
 const {StatusCodes : HttpStatus} = require("http-status-codes");
 const { getOtpSchema } = require("../../validators/user/user.validation");
 const { Controller } = require("../controller");
 const { UserModel } = require("../../../models/users");
+const { RandomNumberGenerator } = require("../../../utils/functions");
 
 class UserController extends Controller {
   async getOtp(req, res, next) {
     try {
+      //check the validation of body(mobile)
       await getOtpSchema.validateAsync(req.body);
       const { mobile } = req.body;
+      // make a 5 digit number
       const code = RandomNumberGenerator()
       const result = await this.saveUser(mobile, code)
       if (!result) throw createError.Unauthorized("can not login")
       return res.status(HttpStatus.OK).send({
         data: {
-          statusCode: HttpStatus.OK,
+          statusCode:HttpStatus.OK,
           data: {
             message: "otp sent successfully",
             code,
@@ -71,31 +74,39 @@ class UserController extends Controller {
       next(error)
     }
   }
+  // if user existed =>update otp field if not =>make a new user
   async saveUser(mobile, code) {
+    // time of now
     const now = (new Date().getTime())
     let otp = {
       code,
       expiresIn: now  + 120000,
     }
+    //the result of user variable is true or false
     const user = await this.checkExistUser(mobile);
+    //if the user is already existed in user collection
     if (user){
-      console.log(user.otp, now);
-      if (+user.otp.expiresIn > now) throw createError.Forbidden("کد اعتبار سنجی قبلی هنوز منقضی نشده است")
+      //check the otp field for user to see if the otp is still valid or  be expired
+      if (+user.otp.expiresIn > now) throw createError.Forbidden("the last OTP is still valid")
       return (await this.updateUser(mobile, { otp }))
     }
+    //if user not exist in user collection then make a new user
     return (await UserModel.create({
       mobile,
       otp,
       Role: ROLES.USER
     }))
   }
+  // the return of this function is the user data (if exist)
   async checkExistUser(mobile) {
     const user = await UserModel.findOne({ mobile });
     return user
   }
+  //the return of this function is true(if update the user collection) of false(do not update the use collection)
   async updateUser(mobile, objectData = {}) {
+    const wrongValues=["", " ", 0, null, undefined, "0", NaN]
     Object.keys(objectData).forEach(key => {
-      if (["", " ", 0, null, undefined, "0", NaN].includes(objectData[key])) delete objectData[key]
+      if (wrongValues.includes(objectData[key])) delete objectData[key]
     })
     const updateResult = await UserModel.updateOne({ mobile }, { $set: objectData })
     return !!updateResult.modifiedCount
