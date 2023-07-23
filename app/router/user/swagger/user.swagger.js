@@ -72,7 +72,7 @@
  *      post:
  *          tags : [user routes]
  *          summary: chack-otp value in user controller
- *          description: chack otp with codce- mobile and expires date
+ *          description: check otp with codce- mobile and expires date
  *          requestBody:
  *              required: true
  *              content:

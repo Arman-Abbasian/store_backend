@@ -7,6 +7,7 @@ const moment = require("moment-jalali");
 const { ACCESS_TOKEN_SECRET_KEY, REFRESH_TOKEN_SECRET_KEY } = require("./constans");
 const redisClient = require("./initRedis");
 
+//make a 5 digit number
 function RandomNumberGenerator() {
     return Math.floor((Math.random() * 90000) + 10000)
 }

@@ -9,6 +9,9 @@ const { UserModel } = require("../../../models/users");
 const { RandomNumberGenerator } = require("../../../utils/functions");
 
 class UserController extends Controller {
+  //clint send the mobile number 
+  //1- validate mobile number
+  //2-check the existance user based on mobile number in user collection (if user existed =>update otp field if not =>make a new user)
   async getOtp(req, res, next) {
     try {
       //check the validation of body(mobile)
@@ -18,7 +21,7 @@ class UserController extends Controller {
       const code = RandomNumberGenerator()
       const result = await this.saveUser(mobile, code)
       if (!result) throw createError.Unauthorized("can not login")
-      return res.status(HttpStatus.OK).send({
+      return res.status(HttpStatus.OK).json({
         data: {
           statusCode:HttpStatus.OK,
           data: {
