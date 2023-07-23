@@ -1,9 +1,11 @@
 const morgan = require("morgan");
 const swaggerUI = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
+const cors=require("cors")
+const path=require("path")
 
 function configApplication(app,express){
-    const path=require("path")
+    app.use(cors())
     //morgan package to log all client requests
     app.use(morgan("dev"));
     //settings for the client send files
