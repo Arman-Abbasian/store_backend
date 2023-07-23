@@ -97,7 +97,7 @@
  *  /user/refresh-token:
  *      post:
  *          tags: [user routes]
- *          summary: send refresh token ffor get new token and refresh token
+ *          summary: send refresh token for get new token and refresh token
  *          description : fresh token
  *          requestBody:
  *              required: true

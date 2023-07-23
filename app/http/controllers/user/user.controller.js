@@ -66,10 +66,14 @@ class UserController extends Controller {
   }
   async refreshToken(req, res, next) {
     try {
+      //the refresh toke sendet automatically and on time, when the access token become expired
       const { refreshToken } = req.body;
+      //check if the refresh token is valid
       const mobile = await VerifyRefreshToken(refreshToken);
       const user = await UserModel.findOne({ mobile })
+      //produce the new access token
       const accessToken = await SignAccessToken(user._id);
+      //produce the new refresh token
       const newRefreshToken = await SignRefreshToken(user._id);
       return res.status(HttpStatus.OK).json({
         StatusCode: HttpStatus.OK,
