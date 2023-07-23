@@ -1,9 +1,9 @@
 
 const createError = require("http-errors");
 const { ROLES } = require("../../../utils/constans");
-//const {SignAccessToken, VerifyRefreshToken, SignRefreshToken, getBasketOfUser } = require("../../../utils/functions");
+const {SignAccessToken, VerifyRefreshToken, SignRefreshToken, getBasketOfUser } = require("../../../utils/functions");
 const {StatusCodes : HttpStatus} = require("http-status-codes");
-const { getOtpSchema } = require("../../validators/user/user.validation");
+const { getOtpSchema, checkOtpSchema } = require("../../validators/user/user.validation");
 const { Controller } = require("../controller");
 const { UserModel } = require("../../../models/users");
 const { RandomNumberGenerator } = require("../../../utils/functions");
@@ -37,14 +37,20 @@ class UserController extends Controller {
   }
   async checkOtp(req, res, next) {
     try {
-      await chackOtpSchema.validateAsync(req.body)
+      //validate client mobile and code 
+      await checkOtpSchema.validateAsync(req.body)
       const { mobile, code } = req.body;
+      //find the user with mobile in User collection
       const user = await UserModel.findOne({ mobile }, { password: 0, refreshToken: 0, accessToken: 0}).populate([{path: "Courses"}])
-      if (!user) throw createError.NotFound("کاربر یافت نشد")
-      if (user.otp.code != code) throw createError.Unauthorized("کد ارسال شده صحیح نمیباشد");
+      if (!user) throw createError.NotFound("user is not exist")
+      //if the client otp code was not equal with the otp code in user Collection
+      if (user.otp.code != code) throw createError.Unauthorized("code in not true");
+      //check if the otp code not be expired
       const now = (new Date()).getTime();
-      if (+user.otp.expiresIn < now) throw createError.Unauthorized("کد شما منقضی شده است");
-      const accessToken = await SignAccessToken(user._id)
+      if (+user.otp.expiresIn < now) throw createError.Unauthorized("code is expired");
+      //produce access token
+      const accessToken = await SignAccessToken(user._id);
+      //produce refresh token
       const refreshToken = await SignRefreshToken(user._id);
       return res.status(HttpStatus.OK).json({
         statusCode : HttpStatus.OK,

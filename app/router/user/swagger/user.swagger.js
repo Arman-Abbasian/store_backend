@@ -71,8 +71,8 @@
  *  /user/check-otp:
  *      post:
  *          tags : [user routes]
- *          summary: chack-otp value in user controller
- *          description: check otp with codce- mobile and expires date
+ *          summary: check-otp value in user controller
+ *          description: check otp with code- mobile and expires date
  *          requestBody:
  *              required: true
  *              content:
