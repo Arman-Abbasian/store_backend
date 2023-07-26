@@ -1,10 +1,15 @@
 module.exports = {
     MongoIDPattern : /^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i ,
     ROLES : Object.freeze({
+        //ordinary users
         USER : "USER",
+        //admin of site
         ADMIN : "ADMIN",
+        // persons who just produce cotext(add products or write blogs)
         WRITER : "WRITER",
+        //person who is the owner of a virtual product
         TEACHER : "TEACHER",
+        // person who is the owner of a product
         SUPPLIER : "SUPPLIER"
     }),
     PERMISSIONS : Object.freeze({
