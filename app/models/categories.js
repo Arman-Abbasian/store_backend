@@ -1,7 +1,7 @@
 const { default: mongoose } = require("mongoose");
 
 const Schema = new mongoose.Schema({
-    title : {type : String, required : true},
+    title : {type : String, required : true,unique:true},
     parent : {type : mongoose.Types.ObjectId, ref: "category", default : undefined}
 }, {
     id : false,
@@ -19,6 +19,9 @@ function autoPopulate(next) {
     next()
 }
 Schema.pre('findOne', autoPopulate).pre("find", autoPopulate)
+
+
+
 module.exports = {
     CategoryModel : mongoose.model("category", Schema)
 } 
