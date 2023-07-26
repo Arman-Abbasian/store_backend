@@ -28,7 +28,7 @@ function configApplication(app,express){
                   "first full backend project with node-js",
                 contact: {
                   name: "Arman Abasian",
-                  url: "linkding",
+                  url: "linkedin",
                   email: "abasian.arman@gmail.com",
                 },
               },

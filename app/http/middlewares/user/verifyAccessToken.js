@@ -8,6 +8,7 @@ function getToken(headers) {
   if (token && bearer.toLowerCase()==="bearer") return token;
   throw createHttpError.Unauthorized("please enter your account");
 }
+//verify the access token(get token as req.header and add a property to req=>req.user)
 function VerifyAccessToken(req, res, next) {
   try {
     //get the token

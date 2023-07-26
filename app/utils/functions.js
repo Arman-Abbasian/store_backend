@@ -5,13 +5,13 @@ const fs = require("fs");
 const path = require("path");
 const moment = require("moment-jalali");
 const { ACCESS_TOKEN_SECRET_KEY, REFRESH_TOKEN_SECRET_KEY } = require("./constans");
-const redisClient = require("./initRedis");
+
 
 //make a 5 digit number
 function RandomNumberGenerator() {
     return Math.floor((Math.random() * 90000) + 10000)
 }
-//produce access token
+//produce access token(get userId as input and return the access token)
 function SignAccessToken(userId) {
     return new Promise(async (resolve, reject) => {
         const user = await UserModel.findById(userId)
@@ -28,7 +28,7 @@ function SignAccessToken(userId) {
         })
     })
 }
-//produce refresh token
+//produce refresh token(get userId as input and return the refresh token)
 function SignRefreshToken(userId) {
     return new Promise(async (resolve, reject) => {
         const user = await UserModel.findById(userId)
@@ -41,24 +41,22 @@ function SignRefreshToken(userId) {
         //produce a refresh token
         JWT.sign(payload, REFRESH_TOKEN_SECRET_KEY, options, async (err, token) => {
             if (err) reject(createError.InternalServerError("server error"));
-            await redisClient.SETEX(String(userId), (365 * 24 * 60 * 60), token);
             resolve(token)
         })
     })
 }
-//verify the refresh token
+//verify the refresh token(get token as input and return the user)
 function VerifyRefreshToken(token) {
     return new Promise((resolve, reject) => {
-        JWT.verify(token, REFRESH_TOKEN_SECRET_KEY, async (err, payload) => {
-            if (err) reject(createError.Unauthorized("please enter your account"))
+        console.log(REFRESH_TOKEN_SECRET_KEY)
+        JWT.verify(token,REFRESH_TOKEN_SECRET_KEY, async (err, payload) => {
+            if (err) reject(createError.Unauthorized(err))
             const { mobile } = payload || {};
+            console.log(mobile)
             const user = await UserModel.findOne({ mobile }, { password: 0, otp: 0 })
             if (!user) reject(createError.Unauthorized("please enter your account"))
-            //get the saved user refresh token from redis
-            const refreshToken = await redisClient.get(String(user?._id));
-            if (!refreshToken) reject(createError.Unauthorized("please enter your account"))
-            if (token === refreshToken) return resolve(mobile);
-            reject(createError.Unauthorized("please enter your account"))
+            if (user.refreshToken!==token) reject(createError.Unauthorized("please enter your account"))
+            resolve(user);
         })
     })
 }

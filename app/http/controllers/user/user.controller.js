@@ -41,7 +41,7 @@ class UserController extends Controller {
       await checkOtpSchema.validateAsync(req.body)
       const { mobile, code } = req.body;
       //find the user with mobile in User collection
-      const user = await UserModel.findOne({ mobile }, { password: 0, refreshToken: 0, accessToken: 0}).populate([{path: "Courses"}])
+      const user = await UserModel.findOne({ mobile }, { password: 0, refreshToken: 0, accessToken: 0})
       if (!user) throw createError.NotFound("user is not exist")
       //if the client otp code was not equal with the otp code in user Collection
       if (user.otp.code != code) throw createError.Unauthorized("code in not true");
@@ -52,6 +52,9 @@ class UserController extends Controller {
       const accessToken = await SignAccessToken(user._id);
       //produce refresh token
       const refreshToken = await SignRefreshToken(user._id);
+      //update refresh toke in UserModel
+      const updateRefreshTokenFiled=await UserModel.updateOne({_id:user._id},{$set:{refreshToken:refreshToken}});
+      if(updateRefreshTokenFiled. modifiedCount===0) throw createError[500]("server error")
       return res.status(HttpStatus.OK).json({
         statusCode : HttpStatus.OK,
         data: {
@@ -69,12 +72,15 @@ class UserController extends Controller {
       //the refresh toke sendet automatically and on time, when the access token become expired
       const { refreshToken } = req.body;
       //check if the refresh token is valid
-      const mobile = await VerifyRefreshToken(refreshToken);
-      const user = await UserModel.findOne({ mobile })
+      const user = await VerifyRefreshToken(refreshToken);
       //produce the new access token
       const accessToken = await SignAccessToken(user._id);
       //produce the new refresh token
       const newRefreshToken = await SignRefreshToken(user._id);
+      //update refresh toke in UserModel
+      const updateRefreshTokenFiled=await UserModel.updateOne({_id:user._id},{$set:{refreshToken:newRefreshToken}});
+      if(updateRefreshTokenFiled. modifiedCount===0) throw createError[500]("server error")
+      
       return res.status(HttpStatus.OK).json({
         StatusCode: HttpStatus.OK,
         data: {
