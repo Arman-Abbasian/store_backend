@@ -1,12 +1,8 @@
 const createError = require("http-errors");
 const { StatusCodes:HttpStatus} = require("http-status-codes");
 const mongoose = require("mongoose");
-const { CategoryModel } = require("../../../../models/categories");
-const {
-  addCategorySchema,
-  updateCategorySchema,
-} = require("../../../validators/admin/category.schema");
-const Controller = require("../../controller");
+const { CategoryModel } = require("../../../models/categories");
+const { Controller } = require("../controller");
 
 class CategoryController extends Controller {
   async getAllCategory(req, res, next) {
