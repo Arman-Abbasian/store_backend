@@ -46,9 +46,30 @@ class CategoryController extends Controller {
       //check if the category with the id existed in collection or not
       const category = await this.checkExistCategory(id);
       //delete the category and all their children
-      const deleteResult = await CategoryModel.deleteMany({
-        $or: [{ _id: category._id }, { parent: category._id }],
-      });
+      const categoryy = await CategoryModel.aggregate([
+        {
+          $match: { _id: new mongoose.Types.ObjectId(id) },
+        },
+        //add field with the name=>children then find all the documents in categories collection
+        //that the _id field of them is equal to parent field of finded document
+        {
+          $graphLookup:
+          {
+            from:"categories",
+            startWith:"$_id",
+            connectFromField:"_id",
+            connectToField:"parent",
+            //maximum level
+            maxDepth:5,
+            // name of field that show the level
+            depthField:"depth",
+            //name of field
+            as:"children"
+          }
+        },
+      ]);
+      //delete the category with all of it's children in every level
+      const deleteResult=await CategoryModel.deleteMany({ _id: { $in: categoryy } })
       if (deleteResult.deletedCount == 0)
         throw createError.InternalServerError("server error");
       return res.status(HttpStatus.OK).json({
@@ -56,7 +77,7 @@ class CategoryController extends Controller {
         data: {
           message: "deleted successfully",
         },
-      });
+     });
     } catch (error) {
       next(error);
     }

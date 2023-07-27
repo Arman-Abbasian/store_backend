@@ -9,10 +9,10 @@ router.get("/parents", CategoryController.getAllParents)
 router.get("/children/:id", CategoryController.getchildOfParents)
 //get all cateories
 router.get("/all", CategoryController.getAllCategory)
-// router.delete("/remove/:id", CategoryController.removeCategory)
-//  router.get("/list-of-all", CategoryController.getAllCategoryWithoutPopulate)
-// router.get("/:id", CategoryController.getCategoryById)
-// router.patch("/update/:id", CategoryController.editCategoryTitle)
+//get all cateories with defining childeren level (graphlookup)
+router.get("/list-of-all", CategoryController.getAllCategoryWithoutPopulate)
+//get one category with it's children
+router.get("/:id", CategoryController.getCategoryById)
 
 
 module.exports = {

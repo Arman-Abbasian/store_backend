@@ -10,16 +10,16 @@ const Schema = new mongoose.Schema({
     }
 });
 //add a field to categorySchema =>children
-Schema.virtual("children", {
-    ref : "category",
-    localField : "_id",
-    foreignField: "parent"
-})
-function autoPopulate(next) {
-    this.populate([{path : "children", select : {__v : 0, id : 0}}]);
-    next()
-}
-Schema.pre('findOne', autoPopulate).pre("find", autoPopulate)
+// Schema.virtual("children", {
+//     ref : "category",
+//     localField : "_id",
+//     foreignField: "parent"
+// })
+// function autoPopulate(next) {
+//     this.populate([{path : "children", select : {__v : 0, id : 0}}]);
+//     next()
+// }
+// Schema.pre('findOne', autoPopulate).pre("find", autoPopulate)
 
 
 

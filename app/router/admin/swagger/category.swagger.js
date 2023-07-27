@@ -33,73 +33,13 @@
  *              201:
  *                  description: success
  */
-/**
- * @swagger
- *  /admin/category/parents:
- *      get:
- *          tags: [Category(AdminPanel)]
- *          summary: get All parents of Category or Category Heads
- *          responses:
- *              200:
- *                  description: success
- */
 
-/**
- * @swagger
- *  /admin/category/children/{parent}:
- *      get:
- *          tags: [Category(AdminPanel)]
- *          summary: get All children of Parents Category 
- *          parameters:
- *              -   in: path
- *                  name: parent
- *                  type: string
- *                  required: true
- *          responses:
- *              200:
- *                  description: success
- */
-/**
- * @swagger
- *  /admin/category/all:
- *      get:
- *          tags: [Category(AdminPanel)]
- *          summary: get All Categories 
- *          responses:
- *              200:
- *                  description: success
- */
 /**
  * @swagger
  *  /admin/category/remove/{id}:
  *      delete:
  *          tags: [Category(AdminPanel)]
  *          summary: remove category with object-id
- *          parameters:
- *              -   in: path
- *                  name: id
- *                  type: string
- *                  required : true
- *          responses:
- *              200:
- *                  description: success
- */
-/**
- * @swagger
- *  /admin/category/list-of-all:
- *      get:
- *          tags: [Category(AdminPanel)]
- *          summary: get all categories without populate and nested structure
- *          responses:
- *              200:
- *                  description: success
- */
-/**
- * @swagger
- *  /admin/category/{id}:
- *      get:
- *          tags: [Category(AdminPanel)]
- *          summary: find category by object-id
  *          parameters:
  *              -   in: path
  *                  name: id

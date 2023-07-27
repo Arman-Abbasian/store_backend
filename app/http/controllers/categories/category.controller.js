@@ -73,24 +73,37 @@ class CategoryController extends Controller {
   }
   async getCategoryById(req, res, next) {
     try {
-      const { id: _id } = req.params;
+      await idPublicValidation.validateAsync(req.params)
+      const {id} = req.params;
+      //instead of findOne use from aggregate
       const category = await CategoryModel.aggregate([
         {
-          $match: { _id: mongoose.Types.ObjectId(_id) },
+          $match: { _id: new mongoose.Types.ObjectId(id) },
+        },
+        //add field with the name=>children then find all the documents in categories collection
+        //that the _id field of them is equal to parent field of finded document
+        {
+          $graphLookup:
+          {
+            from:"categories",
+            startWith:"$_id",
+            connectFromField:"_id",
+            connectToField:"parent",
+            //maximum level
+            maxDepth:5,
+            // name of field that show the level
+            depthField:"depth",
+            //name of field
+            as:"children"
+          }
         },
         {
-          $lookup: {
-            from: "categories",
-            localField: "_id",
-            foreignField: "parent",
-            as: "children",
-          },
-        },
-        {
-          $project: {
+          $project: 
+          {
             __v: 0,
             "children.__v": 0,
-            "children.parent": 0,
+            "children.__v": 0,
+            
           },
         },
       ]);
@@ -143,7 +156,40 @@ class CategoryController extends Controller {
   }
   async getAllCategoryWithoutPopulate(req, res, next) {
     try {
-      const categories = await CategoryModel.aggregate([{ $match: {} }]);
+      const categories = await CategoryModel.aggregate(
+        [
+          //just get the main parent
+          { 
+            $match: 
+            {
+              parent:undefined
+            } 
+          },
+          //add a field with the name of children that have all children of main parent with the number of level(depth)
+          {
+            $graphLookup:
+            {
+              from:"categories",
+              startWith:"$_id",
+              connectFromField:"_id",
+              connectToField:"parent",
+              //maximum level
+              maxDepth:5,
+              // name of field that show the level
+              depthField:"depth",
+              //name of field
+              as:"children"
+            }
+          },
+          {
+            $project:
+            {
+              __v:0,
+              "children.__v":0,
+            }
+          }
+        
+        ]);
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         data: {
