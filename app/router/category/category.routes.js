@@ -7,7 +7,8 @@ const router = require("express").Router();
 router.get("/parents", CategoryController.getAllParents)
 //get all children of a specific parent
 router.get("/children/:id", CategoryController.getchildOfParents)
-// router.get("/all", CategoryController.getAllCategory)
+//get all cateories
+router.get("/all", CategoryController.getAllCategory)
 // router.delete("/remove/:id", CategoryController.removeCategory)
 //  router.get("/list-of-all", CategoryController.getAllCategoryWithoutPopulate)
 // router.get("/:id", CategoryController.getCategoryById)

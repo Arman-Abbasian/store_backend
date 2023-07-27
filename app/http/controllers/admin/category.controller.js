@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const { addCategorySchema,updateCategorySchema } = require("../../validators/admin/category.validation");
 const { CategoryModel } = require("../../../models/categories");
 const { Controller } = require("../controller");
+const { idPublicValidation } = require("../../validators/public.validation");
 
 class CategoryController extends Controller {
   async addCategory(req, res, next) {
@@ -36,19 +37,24 @@ class CategoryController extends Controller {
       next(error);
     }
   }
+  //delete a category
   async removeCategory(req, res, next) {
     try {
+      //check if the id param is a mongoID
+      await idPublicValidation.validateAsync(req.params)
       const { id } = req.params;
+      //check if the category with the id existed in collection or not
       const category = await this.checkExistCategory(id);
+      //delete the category and all their children
       const deleteResult = await CategoryModel.deleteMany({
         $or: [{ _id: category._id }, { parent: category._id }],
       });
       if (deleteResult.deletedCount == 0)
-        throw createError.InternalServerError("حدف دسته بندی انجام نشد");
+        throw createError.InternalServerError("server error");
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         data: {
-          message: "حذف دسته بندی با موفقیت انجام شد",
+          message: "deleted successfully",
         },
       });
     } catch (error) {
@@ -79,7 +85,7 @@ class CategoryController extends Controller {
   }
   async checkExistCategory(id) {
     const category = await CategoryModel.findById(id);
-    if (!category) throw createError.NotFound("دسته بندی یافت نشد");
+    if (!category) throw createError.NotFound("catrgory is not exist");
     return category;
   }
 }

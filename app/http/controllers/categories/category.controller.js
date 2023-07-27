@@ -126,6 +126,7 @@ class CategoryController extends Controller {
     try {
       await idPublicValidation.validateAsync(req.params)
       const { id } = req.params;
+      const category = await this.checkExistCategory(id);
       const children = await CategoryModel.find(
         { parent:id },
         { __v: 0, parent: 0 }
@@ -152,6 +153,11 @@ class CategoryController extends Controller {
     } catch (error) {
       next(error);
     }
+  }
+  async checkExistCategory(id) {
+    const category = await CategoryModel.findById(id);
+    if (!category) throw createError.NotFound("catrgory is not exist");
+    return category;
   }
 }
 module.exports = {
