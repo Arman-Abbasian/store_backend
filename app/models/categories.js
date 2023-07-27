@@ -9,6 +9,7 @@ const Schema = new mongoose.Schema({
         virtuals: true
     }
 });
+//add a field to categorySchema =>children
 Schema.virtual("children", {
     ref : "category",
     localField : "_id",

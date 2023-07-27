@@ -3,6 +3,7 @@ const { StatusCodes:HttpStatus} = require("http-status-codes");
 const mongoose = require("mongoose");
 const { CategoryModel } = require("../../../models/categories");
 const { Controller } = require("../controller");
+const { idPublicValidation } = require("../../validators/public.validation");
 
 class CategoryController extends Controller {
   async getAllCategory(req, res, next) {
@@ -103,6 +104,7 @@ class CategoryController extends Controller {
       next(error);
     }
   }
+  //get all the categoies that do not have any parent (their parent field is undefined)
   async getAllParents(req, res, next) {
     try {
       const parents = await CategoryModel.find(
@@ -119,11 +121,13 @@ class CategoryController extends Controller {
       next(error);
     }
   }
+  //get the children of a specific parent
   async getchildOfParents(req, res, next) {
     try {
-      const { parent } = req.params;
+      await idPublicValidation.validateAsync(req.params)
+      const { id } = req.params;
       const children = await CategoryModel.find(
-        { parent },
+        { parent:id },
         { __v: 0, parent: 0 }
       );
       return res.status(HttpStatus.OK).json({

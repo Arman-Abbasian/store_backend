@@ -16,7 +16,7 @@
  */
 /**
  * @swagger
- *  /admin/category/children/{parent}:
+ *  /category/children/{parent}:
  *      get:
  *          tags: [category routes]
  *          summary: get All children of Parents Category 
@@ -31,7 +31,7 @@
  */
 /**
  * @swagger
- *  /admin/category/all:
+ *  /category/all:
  *      get:
  *          tags: [category routes]
  *          summary: get All Categories 
@@ -42,7 +42,7 @@
 
 /**
  * @swagger
- *  /admin/category/list-of-all:
+ *  /category/list-of-all:
  *      get:
  *          tags: [category routes]
  *          summary: get all categories without populate and nested structure
@@ -52,7 +52,7 @@
  */
 /**
  * @swagger
- *  /admin/category/{id}:
+ *  /category/{id}:
  *      get:
  *          tags: [category routes]
  *          summary: find category by object-id
