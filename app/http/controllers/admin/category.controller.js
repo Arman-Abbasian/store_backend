@@ -10,6 +10,7 @@ const { Controller } = require("../controller");
 const { idPublicValidation } = require("../../validators/public.validation");
 
 class CategoryController extends Controller {
+  //make a new category
   async addCategory(req, res, next) {
     try {
         //validate title and parent that client sent
@@ -82,22 +83,24 @@ class CategoryController extends Controller {
       next(error);
     }
   }
+  //edit the title of a catogory
   async editCategoryTitle(req, res, next) {
     try {
+      await idPublicValidation.validateAsync(req.params);
+      await updateCategorySchema.validateAsync(req.body);
       const { id } = req.params;
       const { title } = req.body;
       const category = await this.checkExistCategory(id);
-      await updateCategorySchema.validateAsync(req.body);
       const resultOfUpdate = await CategoryModel.updateOne(
         { _id: id },
         { $set: {title} }
       );
       if (resultOfUpdate.modifiedCount == 0)
-        throw createError.InternalServerError("به روزرسانی انجام نشد");
+        throw createError.InternalServerError("server error");
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         data: {
-          message: "به روز رسانی با موفقیت انجام شد",
+          message: "update successfully",
         },
       });
     } catch (error) {

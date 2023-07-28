@@ -10,9 +10,6 @@
  *                  title:
  *                      type: string
  *                      description: the title of category
- *                  parent:
- *                      type: string
- *                      description: the title of category
  */
 /**
  * @swagger
