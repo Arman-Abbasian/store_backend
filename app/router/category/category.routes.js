@@ -7,10 +7,10 @@ const router = require("express").Router();
 router.get("/parents", CategoryController.getAllParents)
 //get all children of a specific parent
 router.get("/children/:id", CategoryController.getchildOfParents)
-//get all cateories
+//get all cateories with nested children
 router.get("/all", CategoryController.getAllCategory)
 //get all cateories with defining childeren level (graphlookup)
-router.get("/list-of-all", CategoryController.getAllCategoryWithoutPopulate)
+router.get("/list-of-all", CategoryController.getMainParentCategoriesWithDepthOfChildren)
 //get one category with it's children
 router.get("/:id", CategoryController.getCategoryById)
 

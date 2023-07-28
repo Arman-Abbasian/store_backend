@@ -31,32 +31,6 @@ class CategoryController extends Controller {
       //         }
       //     }
       // ])
-      // const categories = await CategoryModel.aggregate([
-      //     {
-      //         $graphLookup : {
-      //             from : "categories",
-      //             startWith : "$_id",
-      //             connectFromField : "_id",
-      //             connectToField : "parent",
-      //             maxDepth : 5,
-      //             depthField : "depth",
-      //             as : "children",
-
-      //         }
-      //     },
-      //     {
-      //         $project : {
-      //             __v : 0,
-      //             "children.__v" : 0,
-      //             "children.parent" : 0
-      //         }
-      //     },
-      //     {
-      //         $match : {
-      //             parent : undefined
-      //         }
-      //     }
-      // ])
       const categories = await CategoryModel.find(
         { parent: undefined },
         { __v: 0 }
@@ -82,21 +56,21 @@ class CategoryController extends Controller {
         },
         //add field with the name=>children then find all the documents in categories collection
         //that the _id field of them is equal to parent field of finded document
-        {
-          $graphLookup:
-          {
-            from:"categories",
-            startWith:"$_id",
-            connectFromField:"_id",
-            connectToField:"parent",
-            //maximum level
-            maxDepth:5,
-            // name of field that show the level
-            depthField:"depth",
-            //name of field
-            as:"children"
-          }
-        },
+        // {
+        //   $graphLookup:
+        //   {
+        //     from:"categories",
+        //     startWith:"$_id",
+        //     connectFromField:"_id",
+        //     connectToField:"parent",
+        //     //maximum level
+        //     maxDepth:5,
+        //     // name of field that show the level
+        //     depthField:"depth",
+        //     //name of field
+        //     as:"children"
+        //   }
+        // },
         {
           $project: 
           {
@@ -122,8 +96,9 @@ class CategoryController extends Controller {
     try {
       const parents = await CategoryModel.find(
         { parent: undefined },
-        { __v: 0 }
+        {__v:0}
       );
+      console.log(parents[0])
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         data: {
@@ -154,7 +129,7 @@ class CategoryController extends Controller {
       next(error);
     }
   }
-  async getAllCategoryWithoutPopulate(req, res, next) {
+  async getMainParentCategoriesWithDepthOfChildren(req, res, next) {
     try {
       const categories = await CategoryModel.aggregate(
         [
