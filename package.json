@@ -20,6 +20,7 @@
     "jsonwebtoken": "^9.0.1",
     "moment-jalali": "^0.3.9",
     "mongoose": "^7.3.4",
+    "multer": "^1.4.5-lts.1",
     "redis": "^4.6.7"
   }
 }

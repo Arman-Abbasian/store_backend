@@ -56,16 +56,6 @@
 
 /**
  * @swagger
- *  /admin/blogs:
- *      get:
- *          tags: [ Blog(AdminPanel)]
- *          summary: get all blogs
- *          responses:
- *              200:
- *                  description: success - get array of blogs
- */
-/**
- * @swagger
  *  /admin/blogs/add:
  *      post:
  *          tags: [ Blog(AdminPanel)]
@@ -104,21 +94,6 @@
  *                  description: success
  */
 
-/**
- * @swagger
- *  /admin/blogs/{id}:
- *      get:
- *          summary: get blog by ID and populate this field 
- *          tags: [ Blog(AdminPanel) ]
- *          parameters:
- *              -   in: path
- *                  name: id
- *                  type: string
- *                  required: true
- *          responses:
- *              200:
- *                  description: success
- */
 /**
  * @swagger
  *  /admin/blogs/{id}:
