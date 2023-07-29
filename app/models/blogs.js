@@ -4,12 +4,12 @@ const BlogSchema = new mongoose.Schema({
     //author of blog
     author : {type : mongoose.Types.ObjectId, ref: "user", required : true},
     //title of blog
-    title : {type : String, required : true},
+    title : {type : String, required : true, unique:true},
     //a short text of blog
     short_text : {type : String, required : true},
     //text of blog
     text : {type : String, required : true},
-    //image of blog
+    //image of blog=>the value is a link
     image : {type : String, required : true},
     tags : {type : [String], default : []},
     // category that related to the blog
