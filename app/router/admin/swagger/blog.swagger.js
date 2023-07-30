@@ -5,13 +5,16 @@
  *          Blog:
  *              type: object
  *              required:
+ *                  -   author
  *                  -   title
  *                  -   short_text
  *                  -   text
- *                  -   tags
  *                  -   category
  *                  -   image
  *              properties:
+ *                  author:
+ *                      type: string
+ *                      description: the author of category
  *                  title:
  *                      type: string
  *                      description: the title of category
@@ -56,7 +59,7 @@
 
 /**
  * @swagger
- *  /admin/blogs/add:
+ *  /admin/blog/add:
  *      post:
  *          tags: [ Blog(AdminPanel)]
  *          summary: create Blog document
@@ -70,6 +73,7 @@
  *              201:
  *                  description: created
  */
+
 /**
  * @swagger
  *  /admin/blogs/update/{id}:

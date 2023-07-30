@@ -5,10 +5,7 @@ const multer = require("multer");
 const createError = require("http-errors");
 //return of this function is directory of folder of uplad image in project"
 function createRoute(req) {
-  const date = new Date();
-  const year = date.getFullYear().toString();
-  const month = (date.getMonth()+1).toString();
-  const day = date.getDate().toString();
+  const folderName=req.body.title;
   //make a directory address
   const directory = path.join(
     __dirname,
@@ -17,12 +14,10 @@ function createRoute(req) {
     "public",
     "uploads",
     "blogImages",
-    year,
-    month,
-    day
+    folderName
   );
   //add a property to req.body with the name =>fileUploadPath =>have the link address of blog image
-  req.body.fileUploadPath = path.join("uploads", "blogs", year, month, day);
+  req.body.fileUploadPath = path.join("uploads", "blogs", folderName);
   //make the folder in project
   fs.mkdirSync(directory, { recursive: true });
   return directory;
@@ -40,12 +35,12 @@ const storage = multer.diskStorage({
   },
   //filename is the name of the image
   filename: (req, file, cb) => {
+    const fileName=req.body.title;
     //if file was uploaded
     if (file?.originalname) {
       //get the file extension(.png, .jpg, ...)
       const ext = path.extname(file.originalname);
       //make a name for file
-      const fileName = String(new Date().getTime() + ext);
       //add a property to req.body with the name =>filename =>have the  file name of blog image
       req.body.filename = fileName;
       return cb(null, fileName);
@@ -55,6 +50,8 @@ const storage = multer.diskStorage({
 });
 //check the format of image
 function fileFilter(req, file, cb) {
+  //check the existence of title =>i check it here, because i need it for the name of the folder
+  if(!req.body.title) throw createError.BadRequest("the title of the file is required")
   //extension of image
   const ext = path.extname(file.originalname);
   const extensions = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
@@ -75,7 +72,7 @@ function videoFilter(req, file, cb) {
 const pictureMaxSize = 1 * 1000 * 1000;//1MB
 const videoMaxSize = 300 * 1000 * 1000;//300MB
 const uploadFile = multer({ storage:storage, fileFilter:fileFilter, limits: { fileSize: pictureMaxSize } }); 
-const uploadVideo = multer({ storage:storage, videoFilter:fileFilter, limits: { fileSize: videoMaxSize } }); 
+const uploadVideo = multer({ storage:storage, videoFilter:videoFilter, limits: { fileSize: videoMaxSize } }); 
 module.exports = {
   uploadFile,
   uploadVideo
