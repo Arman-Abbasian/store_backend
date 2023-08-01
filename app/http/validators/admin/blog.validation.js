@@ -9,15 +9,13 @@ const createBlogSchema = Joi.object({
         'string.min': `blog title should have a minimum length of 3`,
         'string.max': `blog title should have a maximum length of 50`,
         'any.required': `blog title is a required field`
-      })
-    .error(createError.BadRequest("blog title is not true")),
+      }),
     text: Joi.string().required().min(80)
     .messages({
         'string.base': `blog text should be a type of 'text'`,
-        'string.max': `blog text should have a maximum length of 80`,
+        'string.min': `blog text should have a min length of 80 character`,
         'any.required': `blog text is a required field`
-      })
-    .error(createError.BadRequest("text of title is not true")),
+      }),
     short_text: Joi.string().required().min(15).max(100)
     .messages({
         'string.base': `short_text of title should be a type of 'text'`,
@@ -26,7 +24,7 @@ const createBlogSchema = Joi.object({
         'any.required': `short_text of title is a required field`
       })
     .error(createError.BadRequest("short_text of title is not true")),
-    //fileUploadPath is made by us with middleware=>is the directory of saved image
+    //fileUploadPath is made by us with middleware=>is the link  of saved image
     fileUploadPath : Joi.allow(),
      //filename is made by us with middleware=>is the name of saved image
     filename: Joi.string().required().pattern(/(\.png|\.jpg|\.webp|\.jpeg|\.gif)$/).error(createError.BadRequest("sent image is not true")),
@@ -38,6 +36,7 @@ const createBlogSchema = Joi.object({
     .error(createError.BadRequest("sent tags is not true")),
     //is the id of related category
     category: Joi.string().pattern(MongoIDPattern).error(createError.BadRequest("category is not true")),
+    image:Joi.allow(),
 });
 
 module.exports = {

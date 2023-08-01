@@ -1,29 +1,49 @@
 const createHttpError = require("http-errors");
-const JWT = require("jsonwebtoken");
 const { UserModel } = require("../../../models/users");
+const JWT = require("jsonwebtoken");
 const { ACCESS_TOKEN_SECRET_KEY } = require("../../../utils/constans");
 
 function getToken(headers) {
-  const [bearer, token] = headers?.authorization?.split(" ") || [];
+  console.log(headers.authorizationn)
+  const [bearer, token] = headers?.authorizationn?.split(" ") || [];
   if (token && bearer.toLowerCase()==="bearer") return token;
-  throw createHttpError.Unauthorized("please enter your account");
+  throw createHttpError.Unauthorized("please login first");
 }
-//verify the access token(get token as req.header and add a property to req=>req.user)
-function VerifyAccessToken(req, res, next) {
+function VerifyAccessOrdinaryUserToken(req, res, next) {
   try {
-    //get the token
     const token = getToken(req.headers);
-    //verify the token
     JWT.verify(token, ACCESS_TOKEN_SECRET_KEY, async (err, payload) => {
       try {
-        if (err) throw createHttpError.Unauthorized("please enter your account");
+        if (err) throw createHttpError.Unauthorized("please login");
         const { mobile } = payload || {};
         const user = await UserModel.findOne(
           { mobile },
           { password: 0, otp: 0 }
         );
-        if (!user) throw createHttpError.Unauthorized("please enter your account");
-        //attach a new property to req =>req.user
+        if (!user) throw createHttpError.Unauthorized("please login");
+        req.user = user;
+        return next();
+      } catch (error) {
+        next(error);
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+function VerifyAccessAdminUserToken(req, res, next) {
+  try {
+    const token = getToken(req.headers);
+    JWT.verify(token, ACCESS_TOKEN_SECRET_KEY, async (err, payload) => {
+      try {
+        if (err) throw createHttpError.Unauthorized("please login");
+        const { mobile } = payload || {};
+        const user = await UserModel.findOne(
+          { mobile },
+          { password: 0, otp: 0 }
+        );
+        if (!user) throw createHttpError.Unauthorized("please login");
+        if(user.Role!=="ADMIN") throw createHttpError.Unauthorized("just admin can access")
         req.user = user;
         return next();
       } catch (error) {
@@ -49,7 +69,8 @@ async function VerifyAccessTokenInGraphQL(req) {
   }
 }
 module.exports = {
-  VerifyAccessToken,
+  VerifyAccessOrdinaryUserToken,
+  VerifyAccessAdminUserToken,
   getToken,
   VerifyAccessTokenInGraphQL
 };

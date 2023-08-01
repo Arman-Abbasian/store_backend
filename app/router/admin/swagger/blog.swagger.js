@@ -5,16 +5,12 @@
  *          Blog:
  *              type: object
  *              required:
- *                  -   author
  *                  -   title
  *                  -   short_text
  *                  -   text
  *                  -   category
  *                  -   image
  *              properties:
- *                  author:
- *                      type: string
- *                      description: the author of category
  *                  title:
  *                      type: string
  *                      description: the title of category
@@ -29,7 +25,7 @@
  *                      description: the list of tags for example(tag1#tag2#tag_foo)
  *                  category:
  *                      type: string
- *                      description: the id of category for foreinField in blog
+ *                      description: the id of category for foreignField in blog
  *                  image:
  *                      type: file
  *                      description: the index picture of blog
@@ -50,7 +46,7 @@
  *                      description: the list of tags for example(tag1#tag2#tag_foo)
  *                  category:
  *                      type: string
- *                      description: the id of category for foreinField in blog
+ *                      description: the id of category for foreignField in blog
  *                  image:
  *                      type: file
  *                      description: the index picture of blog
@@ -63,6 +59,11 @@
  *      post:
  *          tags: [ Blog(AdminPanel)]
  *          summary: create Blog document
+ *          parameters:
+ *            - in: header
+ *              required: true
+ *              name: authorizationn
+ *              type: string
  *          requestBody:
  *              required: true
  *              content:

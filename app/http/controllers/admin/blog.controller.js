@@ -3,7 +3,7 @@ const path = require("path");
 const { StatusCodes:HttpStatus} = require("http-status-codes")
 const createError = require("http-errors");
 
-const { UserModel } = require("../../../models/users");
+const { CategoryModel } = require("../../../models/categories");
 const { createBlogSchema } = require("../../validators/admin/blog.validation");
 const { Controller } = require("../controller");
 const { BlogModel } = require("../../../models/blogs");
@@ -12,20 +12,31 @@ const { deleteFileInPublic } = require("../../../utils/functions");
 class AdminBlogController extends Controller {
     async createBlog(req, res, next){
         try {
-            const blogDataBody = await createBlogSchema.validateAsync(req.body);
-            req.body.image =path.join(blogDataBody.fileUploadPath, blogDataBody.filename)
+            //add a new property to req.body with=> stick link of image to name of image and make a complete link
+            req.body.image =path.join(req.body.fileUploadPath, req.body.filename)
             req.body.image = req.body.image.replace(/\\/g, "/")
-            const {title, text, short_text, category, tags} = blogDataBody;
+            await createBlogSchema.validateAsync(req.body);
+            const {title, text, short_text, category, tags} = req.body;
             const image =  req.body.image
+            //author field is the user is sign in
             const author = req.user._id 
+            //check if the client blog title is unique
+            const repititieTitle=await BlogModel.findOne({title})
+            if(repititieTitle) throw createError.BadRequest("the title existed in DB");
+            //check if the category is existed in categories collection
+            const categoryExistence= await CategoryModel.findOne({_id:category});
+            if(!categoryExistence) throw createError.BadRequest("category is not existed in DB")
             const blog = await BlogModel.create({title,image, text, short_text, category, tags, author})
             return res.status(HttpStatus.CREATED).json({
                 statusCode: HttpStatus.CREATED,
                 data : {
-                    message : "ایجاد بلاگ با موفقیت انجام شد"
+                    message : "blog created successfully"
                 }
             })
         } catch (error) {
+            console.log(req.body.image)
+            //if occur a error in process of upload image and image saved=>this function, delete the saved image
+            //we should put this fuction in this section in all controllers that in them a file saved
             deleteFileInPublic(req.body.image)
             next(error)
         }

@@ -60,10 +60,18 @@ function VerifyRefreshToken(token) {
         })
     })
 }
+//if occur a error in process of upload image and image saved=>this function, delete the saved image
 function deleteFileInPublic(fileAddress) {
     if (fileAddress) {
+        
+        const folderAdress=fileAddress.split("/")
+        console.log(folderAddress)
+        //directory of saved image
         const pathFile = path.join(__dirname, "..", "..", "public", fileAddress)
-        if (fs.existsSync(pathFile)) fs.unlinkSync(pathFile)
+        //if the directory is existed, delete the directory
+        if (fs.existsSync(pathFile)) 
+        fs.unlinkSync(pathFile)
+        fs.rmdirSync(pathFile)
     }
 }
 function ListOfImagesFromRequest(files, fileUploadPath) {

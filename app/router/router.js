@@ -1,3 +1,4 @@
+const {  VerifyAccessAdminUserToken, VerifyAccessOrdinaryUserToken} = require("../http/middlewares/user/user.middleware");
 const { AdminBlogRoutes } = require("./admin/blog.routes");
 const { AdminCategoryRoutes } = require("./admin/category.routes");
 const { HomeRoutes } = require("./api/api.routes");
@@ -16,11 +17,11 @@ router.use("/category", CategoryRoutes)
 //all routes related to blog section
 router.use("/blog", BlogRoutes)
 //all routes related to developer section
-router.use("/developer", DeveloperRoutes)
+router.use("/developer",VerifyAccessOrdinaryUserToken, DeveloperRoutes)
 //all routes related to admin category section
-router.use("/admin/category",AdminCategoryRoutes )
+router.use("/admin/category",VerifyAccessAdminUserToken,AdminCategoryRoutes )
 //all routes related to admin blog section
-router.use("/admin/blog",AdminBlogRoutes )
+router.use("/admin/blog",VerifyAccessAdminUserToken,AdminBlogRoutes )
 
 
 //all routes existed now in AllRoutes
