@@ -64,14 +64,17 @@ function VerifyRefreshToken(token) {
 function deleteFileInPublic(fileAddress) {
     if (fileAddress) {
         
-        const folderAdress=fileAddress.split("/")
-        console.log(folderAddress)
-        //directory of saved image
+        const folderAdressArray=fileAddress.split("/")
+       folderAdressArray.splice(folderAdressArray.length-1);
+       const folderAddress=folderAdressArray.join("/");
+        //directory of saved image file
         const pathFile = path.join(__dirname, "..", "..", "public", fileAddress)
+        //directory of saved image folder
+        const pathFolder = path.join(__dirname, "..", "..", "public", folderAddress)
         //if the directory is existed, delete the directory
         if (fs.existsSync(pathFile)) 
         fs.unlinkSync(pathFile)
-        fs.rmdirSync(pathFile)
+        fs.rmdirSync(pathFolder)
     }
 }
 function ListOfImagesFromRequest(files, fileUploadPath) {
