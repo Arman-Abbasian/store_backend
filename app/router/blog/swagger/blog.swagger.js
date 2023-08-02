@@ -7,7 +7,7 @@
 
 /**
  * @swagger
- *  /admin/blogs:
+ *  /blogs:
  *      get:
  *          tags: [ blog routes]
  *          summary: get all blogs
@@ -18,7 +18,7 @@
 
 /**
  * @swagger
- *  /admin/blogs/{id}:
+ *  /blogs/{id}:
  *      get:
  *          summary: get blog by ID and populate this field 
  *          tags: [ blog routes ]
