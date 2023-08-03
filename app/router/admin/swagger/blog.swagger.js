@@ -56,11 +56,6 @@
  *      post:
  *          tags: [ Blog(AdminPanel)]
  *          summary: create Blog document
- *          parameters:
- *            - in: header
- *              required: true
- *              name: authorizationn
- *              type: string
  *          requestBody:
  *              required: true
  *              content:

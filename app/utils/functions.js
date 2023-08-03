@@ -71,9 +71,10 @@ function deleteFileInPublic(fileAddress) {
         //directory of saved image folder
         const pathFolder = path.join(__dirname, "..", "..", "public", folderAddress)
         //if the directory is existed, delete the directory
-        if (fs.existsSync(pathFile)) 
+        if (fs.existsSync(pathFile)) {
         fs.unlinkSync(pathFile)
         fs.rmdirSync(pathFolder)
+    }
     }
 }
 function ListOfImagesFromRequest(files, fileUploadPath) {

@@ -3,12 +3,14 @@ const fs = require("fs");
 
 const multer = require("multer");
 const createError = require("http-errors");
-const { BlogModel } = require("../../models/blogs");
+const { BlogModel } = require("../models/blogs");
+const { idPublicValidation } = require("../http/validators/public.validation");
+const createHttpError = require("http-errors");
 //return of this function is directory of folder of upload image in project"
 
 async function findBlog(id) {
-  const blog = await BlogModel.findById(id).populate([{path : "category", select : ['title']}, {path: "author", select : ['mobile', 'first_name', 'last_name', 'username']}]);
-  if(!blog) throw createError.NotFound("blog not found");
+  const blog = await BlogModel.findOne({_id:id}).populate([{path : "category", select : ['title']}, {path: "author", select : ['mobile', 'first_name', 'last_name', 'username']}]);
+  if(!blog) return false;
   delete blog.category.children
   return blog
 }
@@ -68,7 +70,7 @@ async function fileFilter(req, file, cb) {
     //find the title of blog
     const {id}=req.params;
     const {title}=await findBlog(id);
-    if(!title) throw createError.InternalServerError("server error")
+    if(!title) throw new Error("server error")
   //extension of image
   const ext = path.extname(file.originalname);
   const extensions = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
@@ -93,9 +95,9 @@ function videoFilter(req, file, cb) {
 const pictureMaxSize = 1 * 1000 * 1000;//1MB
 const videoMaxSize = 300 * 1000 * 1000;//300MB
 //first the fileFiler run then fileSize and then the storage section
-const uploadFile = multer({ storage:storage, fileFilter:fileFilter, limits: { fileSize: pictureMaxSize } }); 
-const uploadVideo = multer({ storage:storage, videoFilter:videoFilter, limits: { fileSize: videoMaxSize } }); 
+const editBlogImage = multer({ storage:storage, fileFilter:fileFilter, limits: { fileSize: pictureMaxSize } }); 
+const editBlogVideo = multer({ storage:storage, videoFilter:videoFilter, limits: { fileSize: videoMaxSize } }); 
 module.exports = {
-  uploadFile,
-  uploadVideo
+  editBlogImage,
+  editBlogVideo
 };

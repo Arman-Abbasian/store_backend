@@ -8,6 +8,7 @@ const { createBlogSchema } = require("../../validators/admin/blog.validation");
 const { Controller } = require("../controller");
 const { BlogModel } = require("../../../models/blogs");
 const { deleteFileInPublic } = require("../../../utils/functions");
+const { idPublicValidation } = require("../../validators/public.validation");
 
 class AdminBlogController extends Controller {
     async createBlog(req, res, next){
@@ -22,7 +23,10 @@ class AdminBlogController extends Controller {
             const author = req.user._id 
             //check if the client blog title is unique
             const repititieTitle=await BlogModel.findOne({title})
-            if(repititieTitle) throw createError.BadRequest("the title existed in DB");
+            if(repititieTitle) {
+                req.body.repatitveTitle=true;
+                throw createError.BadRequest("the title existed in DB");
+            }
             //check if the category is existed in categories collection
             const categoryExistence= await CategoryModel.findOne({_id:category});
             if(!categoryExistence) throw createError.BadRequest("category is not existed in DB")
@@ -34,11 +38,15 @@ class AdminBlogController extends Controller {
                 }
             })
         } catch (error) {
-            console.log(req.body.image)
             //if occur a error in process of upload image and image saved=>this function, delete the saved image
             //we should put this fuction in this section in all controllers that in them a file saved
-            deleteFileInPublic(req.body.image)
-            next(error)
+            if (!req.body.repatitveTitle){
+                deleteFileInPublic(req.body.image)
+                next(error)
+            }else{
+                next(error)
+            }
+           
         }
     }
     async deleteBlogById(req, res, next){
@@ -59,6 +67,7 @@ class AdminBlogController extends Controller {
     }
     async updateBlogById(req, res, next){
         try {
+            await idPublicValidation.validateAsync(req.params)
             const {id} = req.params;
             await this.findBlog(id);
             if(req?.body?.fileUploadPath &&  req?.body?.filename){
@@ -98,7 +107,7 @@ class AdminBlogController extends Controller {
     }
     async findBlog(id) {
         const blog = await BlogModel.findById(id).populate([{path : "category", select : ['title']}, {path: "author", select : ['mobile', 'first_name', 'last_name', 'username']}]);
-        if(!blog) throw createError.NotFound("مقاله ای یافت نشد");
+        if(!blog) throw createError.NotFound("blog is not found");
         delete blog.category.children
         return blog
     }

@@ -19,7 +19,10 @@ function createRoute(req) {
   //add a property to req.body with the name =>fileUploadPath =>have the link address of blog image until folder(with out the name of file)
   req.body.fileUploadPath = path.join("uploads", "blogImages", folderName);
   //make the folder in project
-  fs.mkdirSync(directory, { recursive: true });
+  // fs.mkdirSync(directory, { recursive: true });
+  fs.mkdir(directory, { recursive: true }, (err) => {
+    if (err) throw err;
+  });
   return directory;
 }
 //make the direcory of file in projectStructure=>destination and name of the file=>fileName
@@ -78,9 +81,9 @@ function videoFilter(req, file, cb) {
 const pictureMaxSize = 1 * 1000 * 1000;//1MB
 const videoMaxSize = 300 * 1000 * 1000;//300MB
 //first the fileFiler run then fileSize and then the storage section
-const uploadFile = multer({ storage:storage, fileFilter:fileFilter, limits: { fileSize: pictureMaxSize } }); 
-const uploadVideo = multer({ storage:storage, videoFilter:videoFilter, limits: { fileSize: videoMaxSize } }); 
+const createBlogImage = multer({ storage:storage, fileFilter:fileFilter, limits: { fileSize: pictureMaxSize } }); 
+const uplaodVideo = multer({ storage:storage, videoFilter:videoFilter, limits: { fileSize: videoMaxSize } }); 
 module.exports = {
-  uploadFile,
-  uploadVideo
+  createBlogImage,
+    uplaodVideo
 };

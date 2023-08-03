@@ -4,8 +4,7 @@ const JWT = require("jsonwebtoken");
 const { ACCESS_TOKEN_SECRET_KEY } = require("../../../utils/constans");
 
 function getToken(headers) {
-  console.log(headers.authorizationn)
-  const [bearer, token] = headers?.authorizationn?.split(" ") || [];
+  const [bearer, token] = headers?.authorization?.split(" ") || [];
   if (token && bearer.toLowerCase()==="bearer") return token;
   throw createHttpError.Unauthorized("please login first");
 }
