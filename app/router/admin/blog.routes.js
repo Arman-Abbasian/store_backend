@@ -1,6 +1,6 @@
 const { AdminBlogController } = require("../../http/controllers/admin/blog.controller");
 const { stringToArray } = require("../../http/middlewares/admin/stringToArray");
-const { uploadFile } = require("../../utils/multer");
+const { uploadFile } = require("../../utils/multer/multerCreateBlog");
 
 const router = require("express").Router();
 router.post("/add",uploadFile.single("image"), stringToArray("tags"), AdminBlogController.createBlog)

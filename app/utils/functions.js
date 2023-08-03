@@ -63,7 +63,6 @@ function VerifyRefreshToken(token) {
 //if occur a error in process of upload image and image saved=>this function, delete the saved image
 function deleteFileInPublic(fileAddress) {
     if (fileAddress) {
-        
         const folderAdressArray=fileAddress.split("/")
        folderAdressArray.splice(folderAdressArray.length-1);
        const folderAddress=folderAdressArray.join("/");

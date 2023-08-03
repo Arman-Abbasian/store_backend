@@ -3,7 +3,15 @@ const fs = require("fs");
 
 const multer = require("multer");
 const createError = require("http-errors");
+const { BlogModel } = require("../../models/blogs");
 //return of this function is directory of folder of upload image in project"
+
+async function findBlog(id) {
+  const blog = await BlogModel.findById(id).populate([{path : "category", select : ['title']}, {path: "author", select : ['mobile', 'first_name', 'last_name', 'username']}]);
+  if(!blog) throw createError.NotFound("blog not found");
+  delete blog.category.children
+  return blog
+}
 function createRoute(req) {
   const folderName=req.body.title;
   //make a directory address
@@ -53,18 +61,25 @@ const storage = multer.diskStorage({
     cb(null, null);
   },
 });
-//check the format of image
-function fileFilter(req, file, cb) {
-  //check the existence of title =>i check it here, because i need it for the name of the folder
-  if(!req.body.title) throw createError.BadRequest("the title of the file is required")
+//check the format of image=>fileFilter is a middleware
+async function fileFilter(req, file, cb) {
+  //if image sent by client
+  if(file?.originalname){
+    //find the title of blog
+    const {id}=req.params;
+    const {title}=await findBlog(id);
+    if(!title) throw createError.InternalServerError("server error")
   //extension of image
   const ext = path.extname(file.originalname);
   const extensions = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
   //check the format of file
   if (extensions.includes(ext)) {
+    req.body.title=title;
     return cb(null, true);
   }
   return cb(createError.BadRequest("image format is not true"));
+  }
+  
 }
 //check the format of video
 function videoFilter(req, file, cb) {

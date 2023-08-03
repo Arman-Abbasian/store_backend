@@ -67,20 +67,28 @@ class AdminBlogController extends Controller {
             }
             const data = req.body;
             let nullishData = ["", " ", "0", 0, null, undefined]
-            let blackListFields = ["bookmarks", "deslikes", "comments", "likes", "author"]
+            //the fields that is not allowed change by client=>some field in model not made by client
+            let blackListFields = ["bookmarks", "dislikes", "comments", "likes", "author","title"]
             Object.keys(data).forEach(key => {
-                if(blackListFields.includes(key)) delete data[key]
-                if(typeof data[key] == "string") data[key] = data[key].trim();
-                if(Array.isArray(data[key]) && data[key].length > 0 ) data[key] = data[key].map(item => item.trim()) 
+                //if a client field is equal any name with in the blacklist=>delete that field
+                if(blackListFields.includes(key)) delete data[key];
+                //if a value of client fields is in nullishData array=>delete it
                 if(nullishData.includes(data[key])) delete data[key];
+                //trim the string value of fields
+                if(typeof data[key] == "string") data[key] = data[key].trim();
+                //trim the string value of every element of array fields and delete the empty fields
+                if(Array.isArray(data[key]) && data[key].length > 0 ) {
+                    data[key] = data[key].map(item => item.trim())
+                    data[key]=data[key].filter(item=>!nullishData.includes(item)) 
+                }
             })
             const updateResult = await BlogModel.updateOne({_id : id}, {$set : data})
-            if(updateResult.modifiedCount == 0) throw createError.InternalServerError("به روز رسانی انجام نشد")
+            if(updateResult.modifiedCount == 0) throw createError.InternalServerError("data could not updated")
 
             return res.status(HttpStatus.OK).json({
                 statusCode: HttpStatus.OK,
                 data : {
-                    message : "به روز رسانی بلاگ با موفقیت انجام شد"
+                    message : "data is updated successfully"
                 }
             })
         } catch (error) {

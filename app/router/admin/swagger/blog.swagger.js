@@ -32,9 +32,6 @@
  *          BlogUpdate:
  *              type: object
  *              properties:
- *                  title:
- *                      type: string
- *                      description: the title of category
  *                  short_text:
  *                      type: string
  *                      description: the summary of text of blog
@@ -77,7 +74,7 @@
 
 /**
  * @swagger
- *  /admin/blogs/update/{id}:
+ *  /admin/blog/update/{id}:
  *      patch:
  *          tags: [ Blog(AdminPanel)]
  *          summary: update  Blog document by id 
