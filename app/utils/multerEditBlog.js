@@ -10,7 +10,7 @@ const createHttpError = require("http-errors");
 
 async function findBlog(id) {
   const blog = await BlogModel.findOne({_id:id}).populate([{path : "category", select : ['title']}, {path: "author", select : ['mobile', 'first_name', 'last_name', 'username']}]);
-  if(!blog) return false;
+  if(!blog) throw createHttpError.BadRequest("blog not found");
   delete blog.category.children
   return blog
 }
@@ -65,18 +65,17 @@ const storage = multer.diskStorage({
 });
 //check the format of image=>fileFilter is a middleware
 async function fileFilter(req, file, cb) {
+  console.log(req.body.title)
+const {id}=req.params;
+const {title}=await findBlog(id);
+  req.body.title=title;
   //if image sent by client
   if(file?.originalname){
-    //find the title of blog
-    const {id}=req.params;
-    const {title}=await findBlog(id);
-    if(!title) throw new Error("server error")
   //extension of image
   const ext = path.extname(file.originalname);
   const extensions = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
   //check the format of file
   if (extensions.includes(ext)) {
-    req.body.title=title;
     return cb(null, true);
   }
   return cb(createError.BadRequest("image format is not true"));
