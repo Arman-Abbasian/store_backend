@@ -24,20 +24,12 @@ const BlogSchema = new mongoose.Schema({
     timestamps : true, 
     //delete the __V field
     versionKey : false,
+    //give the allowance to make virtual fields
     toJSON : {
         virtuals: true
     }
 });
-BlogSchema.virtual("user", {
-    ref : "users",
-    localField : "_id",
-    foreignField: "author"
-})
-BlogSchema.virtual("category_detail", {
-    ref : "category",
-    localField : "_id",
-    foreignField: "category"
-})
+//make the imageURL field=>virtual
 BlogSchema.virtual("imageURL").get(function(){
     return `${process.env.BASE_URL}:${process.env.APPLICATION_PORT}/${this.image}`
 })

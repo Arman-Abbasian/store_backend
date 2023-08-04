@@ -99,11 +99,10 @@ class BlogController extends Controller {
         }
     }
     async findBlog(id) {
+        //after find the blog by id, we have to field with mongoId value=>category and author, instead of mongoId value put the 
+        //value of them in their collections(du give the ref collection in blogschema in this two fields)
         const blog = await BlogModel.findById(id).populate([{path : "category", select : ['_id','title']}, {path: "author", select : ['first_name', 'last_name', 'username']}]);
         if(!blog) throw createError.NotFound("blog not found");
-        // here because we use from virtual field(children) in both find and findOne methods we have to delete them here
-        console.log(blog.category.children)
-        delete blog.category.children
         return blog
     }
 }
