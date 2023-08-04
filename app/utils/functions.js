@@ -64,7 +64,9 @@ function VerifyRefreshToken(token) {
 function deleteFileInPublic(fileAddress) {
     if (fileAddress) {
         const folderAdressArray=fileAddress.split("/")
+        //delete the last section of address=>filename
        folderAdressArray.splice(folderAdressArray.length-1);
+       //stick againg all the address to gether =>now we have folder address of the file
        const folderAddress=folderAdressArray.join("/");
         //directory of saved image file
         const pathFile = path.join(__dirname, "..", "..", "public", fileAddress)

@@ -93,7 +93,7 @@
 
 /**
  * @swagger
- *  /admin/blogs/{id}:
+ *  /admin/blog/{id}:
  *      delete:
  *          summary: remove blog by ID 
  *          tags: [ Blog(AdminPanel) ]

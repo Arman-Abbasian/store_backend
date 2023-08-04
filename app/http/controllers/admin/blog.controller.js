@@ -51,14 +51,17 @@ class AdminBlogController extends Controller {
     }
     async deleteBlogById(req, res, next){
         try {
+            await idPublicValidation.validateAsync(req.params);
             const {id} = req.params;
-            await this.findBlog(id);
+            const {image}=await this.findBlog(id);
             const result = await BlogModel.deleteOne({_id : id});
-            if(result.deletedCount == 0) throw createError.InternalServerError("حذف انجام نشد");
+            if (image) deleteFileInPublic(image)
+            if(result.deletedCount == 0) throw createError.InternalServerError("server error");
+            
             return res.status(HttpStatus.OK).json({
                 statusCode : HttpStatus.OK,
                 data : {
-                    message : "حذف مقاله با موفقیت انجام شد"
+                    message : "blog deleted successfully"
                 }
             })
         } catch (error) {
@@ -106,9 +109,8 @@ class AdminBlogController extends Controller {
         }
     }
     async findBlog(id) {
-        const blog = await BlogModel.findById(id).populate([{path : "category", select : ['title']}, {path: "author", select : ['mobile', 'first_name', 'last_name', 'username']}]);
+        const blog = await BlogModel.findById(id)
         if(!blog) throw createError.NotFound("blog is not found");
-        delete blog.category.children
         return blog
     }
 }
