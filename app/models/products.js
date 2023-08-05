@@ -4,15 +4,19 @@ const ProductSchema = new mongoose.Schema({
     title : {type: String, required : true},
     short_text : {type: String, required : true},
     text : {type: String, required : true},
+    //images of product=>is a array of links
     images : {type: [String], required : true},
     tags : {type: [String], default : []},
+    //category of product
     category : {type: mongoose.Types.ObjectId, ref: "category", required : true},
+    //list of comments for this product
     comments : {type: [CommentSchema], default : []},
     likes : {type: [mongoose.Types.ObjectId],ref:'user', default : []},
     dislikes : {type: [mongoose.Types.ObjectId],ref:'user', default : []},
     bookmarks : {type: [mongoose.Types.ObjectId],ref:'user', default : []},
     price : {type: Number, default : 0},
     discount : {type: Number, default : 0},
+    //number of this product in store
     count : {type: Number},
     type : {type: String, required : true}, //virtual - physical
     format : {type: String},

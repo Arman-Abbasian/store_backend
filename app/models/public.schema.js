@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+//because we have comment in many schemas(products,courses,blogs,...) =>we need a public schema
 const AnswerSchema = new mongoose.Schema({
     //who answer the comment
     user : {type : mongoose.Types.ObjectId, ref: "user", required: true},
@@ -18,7 +19,9 @@ const CommentSchema = new mongoose.Schema({
     comment: {type: String, required: true},
     //show comment or not
     show: {type: Boolean, required: true, default: false},
+    // can a user put a comment or not 
     openToComment : {type: Boolean, default: true},
+    //all answers to this comment
     answers : {type: [AnswerSchema], default: []},
 }, {
     timestamps : {createdAt: true}
