@@ -29,7 +29,9 @@ const UserSchema = new mongoose.Schema({
     // user  birthday can be use for the discount due to his or her birthday
     birthday : {type : String},
     Role : {type : [String], default : ["USER"]},
+    //list of courses that user bought
     Courses : {type: [mongoose.Types.ObjectId], ref : "course", default : []},
+    //list of products that user bought
     Products : {type: [mongoose.Types.ObjectId], ref : "product", default : []},
     basket: {type: BasketSchema},
     refreshToken:{type:String}
