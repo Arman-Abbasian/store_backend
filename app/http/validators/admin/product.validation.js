@@ -8,9 +8,9 @@ const createProductSchema = Joi.object({
     text: Joi.string().min(10).max(80).error(createError.BadRequest("text of product is not true")),
     short_text: Joi.string().min(5).max(60).error(createError.BadRequest("short text of product is not true")),
     //tags of products that are array
-    tags: Joi.array().min(0).max(20).error(createError.BadRequest("maximum 20 item")),
+    tags: Joi.array().min(0).max(20).items(Joi.string().required()).error(createError.BadRequest("maximum 20 item")),
     //colors of product that is array
-    colors: Joi.array().min(0).max(20).error(createError.BadRequest("maximum 20 color")),
+    colors: Joi.array().min(0).max(20).items(Joi.string().required()).error(createError.BadRequest("maximum 20 color")),
     //for validation of mongoId you can use form the regex
     category: Joi.string().regex(MongoIDPattern).error(createError.BadRequest("title is not found")),
     price: Joi.number().error(createError.BadRequest("price is not true")),

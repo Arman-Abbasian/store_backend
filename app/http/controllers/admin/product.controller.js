@@ -2,11 +2,12 @@ const createError = require("http-errors");
 const { StatusCodes: HttpStatus } = require("http-status-codes");
 
 const { ProductModel } = require("../../../models/products");
-const { deleteFileInPublic, ListOfImagesFromRequest, copyObject, setFeatures, deleteInvalidPropertyInObject } = require("../../../utils/functions");
+const { deleteFileInPublic, ListOfImagesFromRequest, copyObject, setFeatures, deleteInvalidPropertyInObject, deleteImageFolder } = require("../../../utils/functions");
 
 const { idPublicValidation } = require("../../validators/public.validation");
 const { createProductSchema } = require("../../validators/admin/product.validation");
 const { Controller } = require("../controller");
+const { CategoryModel } = require("../../../models/categories");
 
 const ProductBlackList = {
   BOOKMARKS: "bookmarks",
@@ -25,11 +26,14 @@ Object.freeze(ProductBlackList)
 class ProductController extends Controller {
   async addProduct(req, res, next) {
     try {
+      //list of images link
       const images = ListOfImagesFromRequest(req?.files || [], req.body.fileUploadPath)
       const productBody = await createProductSchema.validateAsync(req.body);
-      const { title, text, short_text, category, tags, count, price, discount, type } = productBody;
+      const { title, text, short_text, category, tags,colors,discount ,count, price, type } = productBody;
+      console.log(colors)
       const supplier = req.user._id;
-      let features = setFeatures(req.body)
+      //gather weight, length, width, height in a object=>features
+      let features = setFeatures(productBody)
       const product = await ProductModel.create({
         title,
         text,
@@ -42,16 +46,18 @@ class ProductController extends Controller {
         images,
         features,
         supplier,
-        type
+        type,
+        colors
       })
       return res.status(HttpStatus.CREATED).json({
         statusCode: HttpStatus.CREATED,
         data: {
-          message: "ثبت محصول با موفقیت انجام شد"
+          message: "product add successfully"
         }
       });
     } catch (error) {
-      deleteFileInPublic(req.body.image)
+      console.log(req.body.foldername,"products")
+      deleteImageFolder(req.body.foldername,"products")
       next(error);
     }
   }
@@ -97,6 +103,16 @@ class ProductController extends Controller {
     const product = await ProductModel.findById(id);
     if (!product) throw new createError.NotFound("محصولی یافت نشد")
     return product
+  }
+  async findCategoryById(categoryId){
+    const { id } = await idPublicValidation.validateAsync({ categoryId });
+    const category = await CategoryModel.aggregate([
+      {
+        $match: { _id: id },
+      },
+    ]);
+    if (!category) throw new createError.NotFound("category not found")
+    return category
   }
 }
 

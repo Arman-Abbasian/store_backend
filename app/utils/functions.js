@@ -3,6 +3,7 @@ const createError = require("http-errors")
 const { UserModel } = require("../models/users")
 const fs = require("fs");
 const path = require("path");
+const fsExtra = require('fs-extra');
 const moment = require("moment-jalali");
 const { ACCESS_TOKEN_SECRET_KEY, REFRESH_TOKEN_SECRET_KEY } = require("./constans");
 
@@ -79,6 +80,21 @@ function deleteFileInPublic(fileAddress) {
     }
     }
 }
+//if occur a error in process of upload image and image saved=>this function, delete the saved image
+function deleteImageFolder(folderAddress,mainFoldername) {
+    console.log(mainFoldername)
+    if (folderAddress) {
+        //directory of saved image file
+        const pathFolder = path.join(__dirname, "..", "..", "public","uploads",mainFoldername, folderAddress)
+        console.log(pathFolder)
+        //directory of saved image folder
+        if (fs.existsSync(pathFolder)) {
+            fsExtra.emptyDirSync(pathFolder);
+            fs.rmdirSync(pathFolder)
+    }
+    }
+}
+//make the array of uploaded file's link 
 function ListOfImagesFromRequest(files, fileUploadPath) {
     if (files?.length > 0) {
         return ((files.map(file => path.join(fileUploadPath, file.filename))).map(item => item.replace(/\\/g, "/")))
@@ -87,9 +103,8 @@ function ListOfImagesFromRequest(files, fileUploadPath) {
     }
 }
 function setFeatures(body) {
-    const { colors, width, weight, height, length } = body;
+    const { width, weight, height, length } = body;
     let features = {};
-    features.colors = colors;
     if (!isNaN(+width) || !isNaN(+height) || !isNaN(+weight) || !isNaN(+length)) {
         if (!width) features.width = 0;
         else features.width = +width;
@@ -305,5 +320,6 @@ module.exports = {
     getTimeOfChapter,
     calculateDiscount,
     invoiceNumberGenerator,
-    getBasketOfUser
+    getBasketOfUser,
+    deleteImageFolder
 }

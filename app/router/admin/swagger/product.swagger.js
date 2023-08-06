@@ -28,7 +28,6 @@
  *                  -   title
  *                  -   short_text
  *                  -   text
- *                  -   tags
  *                  -   category
  *                  -   price
  *                  -   discount
@@ -37,33 +36,33 @@
  *                  title:
  *                      type: string
  *                      description: the title of product
- *                      example: عنوان محصول
+ *                      example: the title of product
  *                  short_text:
  *                      type: string
- *                      description: the title of product
- *                      example: متن کوتاه شده تستی
+ *                      description: the short_text of product
+ *                      example: a short text about product
  *                  text:
  *                      type: string
- *                      description: the title of product
- *                      example: متن بلد تستی
+ *                      description: the text of product
+ *                      example: description about product
  *                  tags:
  *                      type: array
- *                      description: the title of product
+ *                      description: the tags of product
  *                  category:
  *                      type: string
- *                      description: the title of product
+ *                      description: the category of product
  *                      example: 6279e994c1e47a98d0f356d3
  *                  price:
  *                      type: string
- *                      description: the title of product
+ *                      description: the price of product
  *                      example: 2500000
  *                  discount:
  *                      type: string
- *                      description: the title of product
+ *                      description: the discount of product
  *                      example: 20
  *                  count:
  *                      type: string
- *                      description: the title of product
+ *                      description: the count of product
  *                      example: 100
  *                  images:
  *                      type: array
@@ -105,15 +104,15 @@
  *                  title:
  *                      type: string
  *                      description: the title of product
- *                      example: عنوان محصول
+ *                      example: title of product
  *                  short_text:
  *                      type: string
  *                      description: the title of product
- *                      example: متن کوتاه شده تستی
+ *                      example:a short text about product
  *                  text:
  *                      type: string
  *                      description: the title of product
- *                      example: متن بلد تستی
+ *                      example: description about product
  *                  tags:
  *                      type: array
  *                      description: the title of product
@@ -166,7 +165,7 @@
 
 /**
  * @swagger
- *  /admin/products/add:
+ *  /admin/product/add:
  *      post:
  *          tags: [Product(AdminPanel)]
  *          summary: create and save product

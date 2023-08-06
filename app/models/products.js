@@ -21,13 +21,13 @@ const ProductSchema = new mongoose.Schema({
     type : {type: String, required : true}, //virtual - physical
     format : {type: String},
     supplier : {type: mongoose.Types.ObjectId, ref:"user", required : true},
+    colors : {type: [String], default:[]},
     //if the product is physical, this is the features of physical product
     features : {type: Object, default : {
         length : "",
         height : "",
         width : "",
         weight : "",
-        colors : [],
         madein : ""
     }},
 }, {
