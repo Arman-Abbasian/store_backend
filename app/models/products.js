@@ -1,9 +1,9 @@
 const { default: mongoose } = require("mongoose");
 const { CommentSchema } = require("./public.schema");
 const ProductSchema = new mongoose.Schema({
-    title : {type: String, required : true},
-    short_text : {type: String, required : true},
-    text : {type: String, required : true},
+    title : {type: String,min:3,max:30, required : true},
+    short_text : {type: String,min:5,max:60, required : true},
+    text : {type: String,min:10,max:80, required : true},
     //images of product=>is a array of links
     images : {type: [String], required : true},
     tags : {type: [String], default : []},

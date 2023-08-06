@@ -1,6 +1,6 @@
 const { ProductController } = require("../../http/controllers/admin/product.controller");
 const { stringToArray } = require("../../http/middlewares/admin/stringToArray");
-const { uploadFile } = require("../../utils/multer");
+const { uploadFile } = require("../../utils/multerCreateProduct");
 
 const router = require("express").Router();
 router.post("/add", uploadFile.array("images", 10), stringToArray("tags", "colors"),ProductController.addProduct)

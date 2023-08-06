@@ -3,11 +3,10 @@ const { StatusCodes: HttpStatus } = require("http-status-codes");
 
 const { ProductModel } = require("../../../models/products");
 const { deleteFileInPublic, ListOfImagesFromRequest, copyObject, setFeatures, deleteInvalidPropertyInObject } = require("../../../utils/functions");
-const {
-  createProductSchema,
-} = require("../../../validators/admin/product.schema");
-const Controller = require("../../controller");
+
 const { idPublicValidation } = require("../../validators/public.validation");
+const { createProductSchema } = require("../../validators/admin/product.validation");
+const { Controller } = require("../controller");
 
 const ProductBlackList = {
   BOOKMARKS: "bookmarks",

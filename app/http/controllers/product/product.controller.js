@@ -1,9 +1,9 @@
 const createError = require("http-errors");
 const { StatusCodes: HttpStatus } = require("http-status-codes");
 
-const { ProductModel } = require("../../../../models/products");
-const { ObjectIdValidator } = require("../../../validators/public.validator");
-const Controller = require("../../controller");
+const { ProductModel } = require("../../../models/products");
+const { idPublicValidation } = require("../../validators/public.validation");
+const { Controller } = require("../controller");
 
 
 const ProductBlackList = {
@@ -59,7 +59,7 @@ class ProductController extends Controller {
     }
   }
   async findProductById(productID) {
-    const { id } = await ObjectIdValidator.validateAsync({ id: productID });
+    const { id } = await idPublicValidation.validateAsync({ id: productID });
     const product = await ProductModel.findById(id);
     if (!product) throw new createError.NotFound("محصولی یافت نشد")
     return product
