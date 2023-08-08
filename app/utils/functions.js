@@ -304,47 +304,42 @@ async function getBasketOfUser(userID, discount = {}){
     ]);
     return copyObject(userDetail)
 }
-const stringToArrayFunction = function(...args) {
-        const nullishData=["0","",null,undefined," "]
-        const fields = args;
-        console.lgo(fields)
-        fields.forEach(field => {
-            //if that field sent by body 
-            if(req.body[field]){
+const stringToArrayFunction = function(arrayField) {
+            if(arrayField){
                 //if the typeof that body field was string
-                if(typeof req.body[field] == "string"){
+                if(typeof arrayField == "string"){
                     //if the format of body was #tag1#tag2#tag3
-                    if(req.body[field].indexOf("#") >=0){
-                        req.body[field] = (req.body[field].split("#")).map(item => item.trim())
+                    if(arrayField.indexOf("#") >=0){
+                        arrayField = (arrayField.split("#")).map(item => item.trim())
                         //remove nullish data
-                        req.body[field]=req.body[field].filter(item=>item!==undefined||null||""||" ")
+                        arrayField=arrayField.filter(item=>item!==undefined||null||""||" ")
                          //remove the repetitive  tags
-                        req.body[field] = [... new Set(req.body[field])]
+                        arrayField = [... new Set(arrayField)]
                         //if the format of body was tag1,tag2,tag3
-                    }else if(req.body[field].indexOf(",") >=0){
-                        req.body[field] = (req.body[field].split(",")).map(item => item.trim())
+                    }else if(arrayField.indexOf(",") >=0){
+                        arrayField = (arrayField.split(",")).map(item => item.trim())
                         //remove nullish data
-                        req.body[field]=req.body[field].filter(item=>item!==undefined||null||""||" ")
+                        arrayField=arrayField.filter(item=>item!==undefined||null||""||" ")
                          //remove the repetitive  tags
-                         console.log(req.body[field])
-                        req.body[field] = [... new Set(req.body[field])]
-                        console.log(req.body[field])
+                         console.log(arrayField)
+                        arrayField = [... new Set(arrayField)]
+                        console.log(arrayField)
                     }else{ 
                         //if client send one tag=>put that tag in array
-                        req.body[field] = [req.body[field]]
+                        arrayField = [arrayField]
                     }
                 }
                 //if the format of body field was array
-                if(Array.isArray(req.body[field])){
+                if(Array.isArray(arrayField)){
                     //trim the each element of array
-                    req.body[field] = req.body[field].map(item => item.trim())
+                    arrayField = arrayField.map(item => item.trim())
                     //remove the repetitive  tags
-                    req.body[field] = [... new Set(req.body[field])]
+                    arrayField = [... new Set(arrayField)]
                 }
             }else{
-                req.body[field] = []
+                arrayField = []
             }
-        })
+            return arrayField
     }
 module.exports = {
     RandomNumberGenerator,
@@ -362,5 +357,6 @@ module.exports = {
     calculateDiscount,
     invoiceNumberGenerator,
     getBasketOfUser,
-    deleteImageFolder
+    deleteImageFolder,
+    stringToArrayFunction
 }

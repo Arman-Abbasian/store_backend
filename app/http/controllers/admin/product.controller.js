@@ -5,7 +5,7 @@ const createError = require("http-errors");
 const { StatusCodes: HttpStatus } = require("http-status-codes");
 
 const { ProductModel } = require("../../../models/products");
-const { deleteFileInPublic, ListOfImagesFromRequest, copyObject, setFeatures, deleteInvalidPropertyInObject, deleteImageFolder } = require("../../../utils/functions");
+const { deleteFileInPublic, ListOfImagesFromRequest, copyObject, setFeatures, deleteInvalidPropertyInObject, deleteImageFolder, stringToArrayFunction } = require("../../../utils/functions");
 const { idPublicValidation } = require("../../validators/public.validation");
 const { createProductSchema } = require("../../validators/admin/product.validation");
 const { Controller } = require("../controller");
@@ -46,7 +46,7 @@ class ProductController extends Controller {
           foldername
         );
         //req.body.fileUploadPath  is the link of the image until folder not file
-        req.body.fileUploadPath = path.join("uploads", "products", foldername);
+        req.body.fileUploadPath = path.join("uploads", "productImages", foldername);
         //make the directory in project
         fs.mkdirSync(directory, { recursive: true });
         return directory;
@@ -89,50 +89,54 @@ class ProductController extends Controller {
       const upload = multer({ storage, fileFilter, limits: { fileSize: pictureMaxSize } })
      .array("images",5)
       upload(req, res, async function (err) {
+       try {
         if (err) {
-            throw createError.InternalServerError("Error uploading images");
-        }else{
-          async function ee(){
-          const images =await ListOfImagesFromRequest(req?.files || [], req.body.fileUploadPath)
-          stringToArray("colors","tags")
-          console.log(req.body.colors)
-          const productBody =await  createProductSchema.validateAsync(req.body);
-          const { title, text, short_text, category, tags,discount ,count, price, type } = productBody;
-      const supplier = req.user._id;
-      //gather weight, length, width, height in a object=>features
-      let features = setFeatures(productBody)
-      const product =await  ProductModel.create({
-        title,
-        text,
-        short_text,
-        category,
-        tags,
-        count,
-        price,
-        discount,
-        images,
-        features,
-        supplier,
-        type,
-      })
-      
-      return res.status(HttpStatus.CREATED).json({
-        statusCode: HttpStatus.CREATED,
-        data: {
-          product,
-          message: "product add successfully"
+          throw createError.BadRequest ("Error uploading images");
+      }else{
+        async function ee(){
+        const images =await ListOfImagesFromRequest(req?.files || [], req.body.fileUploadPath)
+        req.body.colors=stringToArrayFunction(req.body.colors);
+        req.body.tags=stringToArrayFunction(req.body.tags);
+        const productBody =await  createProductSchema.validateAsync(req.body);
+        const { title, text, short_text, category,discount,colors,tags ,count, price, type } = productBody;
+    const supplier = req.user._id;
+    //gather weight, length, width, height in a object=>features
+    let features = setFeatures(productBody)
+    const product =await  ProductModel.create({
+      title,
+      text,
+      short_text,
+      category,
+      tags,
+      count,
+      price,
+      discount,
+      images,
+      features,
+      supplier,
+      type,
+      colors
+    })
+    
+    return res.status(HttpStatus.CREATED).json({
+      statusCode: HttpStatus.CREATED,
+      data: {
+        product,
+        message: "product add successfully"
+      }
+    });
         }
-      });
-          }
-          await ee()
-        }
+        await ee()
+      }
+       } catch (error) {
+        console.log("error:"+error)
+        deleteImageFolder(foldername,"productImages")
+      next(error);
+       }
     });
       //list of images link
       
-      
-      
-      
-    } catch (error) {
+  } catch (error) {
       deleteImageFolder(foldername,"productImages")
       next(error);
     }
