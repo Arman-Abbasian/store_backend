@@ -1,13 +1,18 @@
+const path=require("path");
+const fs=require("fs");
+
 const createError = require("http-errors");
 const { StatusCodes: HttpStatus } = require("http-status-codes");
 
 const { ProductModel } = require("../../../models/products");
 const { deleteFileInPublic, ListOfImagesFromRequest, copyObject, setFeatures, deleteInvalidPropertyInObject, deleteImageFolder } = require("../../../utils/functions");
-
 const { idPublicValidation } = require("../../validators/public.validation");
 const { createProductSchema } = require("../../validators/admin/product.validation");
 const { Controller } = require("../controller");
 const { CategoryModel } = require("../../../models/categories");
+const { uploadFile } = require("../../../utils/multerCreateProduct");
+const multer = require("multer");
+const { stringToArray } = require("../../middlewares/admin/stringToArray");
 
 const ProductBlackList = {
   BOOKMARKS: "bookmarks",
@@ -25,16 +30,78 @@ Object.freeze(ProductBlackList)
 
 class ProductController extends Controller {
   async addProduct(req, res, next) {
+    const foldername=Date.now().toString();
     try {
-      //list of images link
-      const images = ListOfImagesFromRequest(req?.files || [], req.body.fileUploadPath)
-      const productBody = await createProductSchema.validateAsync(req.body);
-      const { title, text, short_text, category, tags,colors,discount ,count, price, type } = productBody;
-      console.log(colors)
+       //multer section
+       function createRoute(req) {
+        const directory = path.join(
+          __dirname,
+          "..",
+          "..",
+          "..",
+          "..",
+          "public",
+          "uploads",
+          "productImages",
+          foldername
+        );
+        //req.body.fileUploadPath  is the link of the image until folder not file
+        req.body.fileUploadPath = path.join("uploads", "products", foldername);
+        //make the directory in project
+        fs.mkdirSync(directory, { recursive: true });
+        return directory;
+      }
+      //third here run=>directory and name of the file in your project
+      const storage = multer.diskStorage({
+        //make the directory for store the image
+        destination: (req, file, cb) => {
+          if (file?.originalname) {
+            const filePath = createRoute(req);
+            return cb(null, filePath);
+          }
+          cb(null, null);
+        },
+        filename: (req, file, cb) => {
+          if (file?.originalname) {
+            const ext = path.extname(file.originalname);
+            const fileName = String(Date.now().toString() + ext);
+            req.body.filename = fileName;
+            return cb(null, fileName);
+          }
+          cb(null, null);
+        },
+      });
+      //first here run=>format of the file
+      function fileFilter(req, file, cb) {
+        //add foldername to body for later use
+        if(file?.originalname){
+          const ext = path.extname(file.originalname);
+          //accepted format
+        const mimetypes = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
+        if (mimetypes.includes(ext)) {
+          return cb(null, true);
+        }
+        return cb(createError.BadRequest("image format is not true"));
+        }
+      }
+      //second here run=>size of the file
+      const pictureMaxSize = 1 * 1000 * 1000;//300MB
+      const upload = multer({ storage, fileFilter, limits: { fileSize: pictureMaxSize } })
+     .array("images",5)
+      upload(req, res, async function (err) {
+        if (err) {
+            throw createError.InternalServerError("Error uploading images");
+        }else{
+          async function ee(){
+          const images =await ListOfImagesFromRequest(req?.files || [], req.body.fileUploadPath)
+          stringToArray("colors","tags")
+          console.log(req.body.colors)
+          const productBody =await  createProductSchema.validateAsync(req.body);
+          const { title, text, short_text, category, tags,discount ,count, price, type } = productBody;
       const supplier = req.user._id;
       //gather weight, length, width, height in a object=>features
       let features = setFeatures(productBody)
-      const product = await ProductModel.create({
+      const product =await  ProductModel.create({
         title,
         text,
         short_text,
@@ -47,17 +114,26 @@ class ProductController extends Controller {
         features,
         supplier,
         type,
-        colors
       })
+      
       return res.status(HttpStatus.CREATED).json({
         statusCode: HttpStatus.CREATED,
         data: {
+          product,
           message: "product add successfully"
         }
       });
+          }
+          await ee()
+        }
+    });
+      //list of images link
+      
+      
+      
+      
     } catch (error) {
-      console.log(req.body.foldername,"products")
-      deleteImageFolder(req.body.foldername,"products")
+      deleteImageFolder(foldername,"productImages")
       next(error);
     }
   }

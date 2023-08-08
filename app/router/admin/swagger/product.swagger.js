@@ -108,7 +108,7 @@
  *                  short_text:
  *                      type: string
  *                      description: the title of product
- *                      example:a short text about product
+ *                      example: a short text about product
  *                  text:
  *                      type: string
  *                      description: the title of product
@@ -185,36 +185,6 @@
  *                              $ref: '#/definitions/publicDefinition'
  */
 
-/**
- * @swagger
- *  /admin/products/list:
- *      get:
- *          tags: [Product(AdminPanel)]
- *          summary: get all products
- *          parameters:
- *              -   in: query
- *                  name: search
- *                  type: string
- *                  description: text for search in title, text, short_text of (product)
- *          responses:
- *              200:
- *                  description: success
- */
-/**
- * @swagger
- *  /admin/products/{id}:
- *      get:
- *          tags: [Product(AdminPanel)]
- *          summary: get one products
- *          parameters:
- *              -   in: path
- *                  name: id
- *                  type: string
- *                  description: objectId of product
- *          responses:
- *              200:
- *                  description: success
- */
 /**
  * @swagger
  *  /admin/products/remove/{id}:

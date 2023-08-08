@@ -19,7 +19,7 @@ router.use("/category", CategoryRoutes)
 //all routes related to blog section
 router.use("/blogs", BlogRoutes)
 //all routes related to blog section
-router.use("/blogs", ProductRoutes)
+router.use("/products", ProductRoutes)
 //all routes related to developer section
 router.use("/developer",VerifyAccessToken, DeveloperRoutes)
 //all routes related to admin category section

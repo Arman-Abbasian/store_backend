@@ -3,9 +3,12 @@ const path = require("path");
 const fs = require("fs");
 const createError = require("http-errors");
 
-const foldername = Date.now().toString();
+
+
+const foldername=Date.now().toString();
 
 function createRoute(req) {
+  console.log(4)
   req.body.foldername=foldername;
   const directory = path.join(
     __dirname,
@@ -13,11 +16,11 @@ function createRoute(req) {
     "..",
     "public",
     "uploads",
-    "products",
-    foldername
+    "productImages",
+    req.body.foldername
   );
   //req.body.fileUploadPath  is the link of the image until folder not file
-  req.body.fileUploadPath = path.join("uploads", "products", foldername);
+  req.body.fileUploadPath = path.join("uploads", "products", req.body.foldername);
   //make the directory in project
   fs.mkdirSync(directory, { recursive: true });
   return directory;
@@ -26,6 +29,7 @@ function createRoute(req) {
 const storage = multer.diskStorage({
   //make the directory for store the image
   destination: (req, file, cb) => {
+    console.log(3)
     if (file?.originalname) {
       const filePath = createRoute(req);
       return cb(null, filePath);
@@ -33,6 +37,7 @@ const storage = multer.diskStorage({
     cb(null, null);
   },
   filename: (req, file, cb) => {
+    console.log(5)
     if (file?.originalname) {
       const ext = path.extname(file.originalname);
       const fileName = String(Date.now().toString() + ext);
@@ -44,8 +49,9 @@ const storage = multer.diskStorage({
 });
 //first here run=>format of the file
 function fileFilter(req, file, cb) {
+  console.log(req.body)
+  console.log(2)
   //add foldername to body for later use
- req.body.foldername=foldername;
   if(file?.originalname){
     const ext = path.extname(file.originalname);
     //accepted format
@@ -53,7 +59,7 @@ function fileFilter(req, file, cb) {
   if (mimetypes.includes(ext)) {
     return cb(null, true);
   }
-  return cb(null,null);
+  return cb(createError.BadRequest("image format is not true"));
   }
 }
 function videoFilter(req, file, cb) {
