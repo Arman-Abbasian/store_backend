@@ -30,6 +30,7 @@ Object.freeze(ProductBlackList)
 
 class ProductController extends Controller {
   async addProduct(req, res, next) {
+    //make a foldername to put some images in it
     const foldername=Date.now().toString();
     try {
        //multer section
@@ -95,11 +96,23 @@ class ProductController extends Controller {
       }else{
         async function ee(){
         const images =await ListOfImagesFromRequest(req?.files || [], req.body.fileUploadPath)
+        //change string to array function
         req.body.colors=stringToArrayFunction(req.body.colors);
+        //change string to array function
         req.body.tags=stringToArrayFunction(req.body.tags);
         const productBody =await  createProductSchema.validateAsync(req.body);
         const { title, text, short_text, category,discount,colors,tags ,count, price, type } = productBody;
     const supplier = req.user._id;
+    //check the existance of category
+    console.log(category)
+    const { id } = await idPublicValidation.validateAsync({ id:category });
+    console.log(id)
+    const categoryExistance = await CategoryModel.aggregate([
+      {
+        $match: { _id: id },
+      },
+    ]);
+    if (!categoryExistance) throw new createError.NotFound("category not found")
     //gather weight, length, width, height in a object=>features
     let features = setFeatures(productBody)
     const product =await  ProductModel.create({
@@ -121,7 +134,6 @@ class ProductController extends Controller {
     return res.status(HttpStatus.CREATED).json({
       statusCode: HttpStatus.CREATED,
       data: {
-        product,
         message: "product add successfully"
       }
     });
@@ -129,7 +141,6 @@ class ProductController extends Controller {
         await ee()
       }
        } catch (error) {
-        console.log("error:"+error)
         deleteImageFolder(foldername,"productImages")
       next(error);
        }
