@@ -31,6 +31,9 @@ const ProductSchema = new mongoose.Schema({
         madein : ""
     }},
 }, {
+    timestamps : true, 
+    //delete the __V field
+    versionKey : false,
     toJSON: {
         virtuals: true
     }
@@ -38,6 +41,12 @@ const ProductSchema = new mongoose.Schema({
 ProductSchema.index({title : "text", short_text : "text", text : "text"})
 ProductSchema.virtual("imagesURL").get(function(){
     return this.images.map(image => `${process.env.BASE_URL}:${process.env.APPLICATION_PORT}/${image}`)
+})
+ProductSchema.virtual("numberOfLikes").get(function(){
+    return this.likes.length
+})
+ProductSchema.virtual("numberOfBookmarks").get(function(){
+    return this.bookmarks.length
 })
 module.exports = {
     ProductModel : mongoose.model("product", ProductSchema)
