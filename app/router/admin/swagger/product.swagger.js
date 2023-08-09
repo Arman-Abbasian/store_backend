@@ -187,7 +187,7 @@
 
 /**
  * @swagger
- *  /admin/products/remove/{id}:
+ *  /admin/product/remove/{id}:
  *      delete:
  *          tags: [Product(AdminPanel)]
  *          summary: delete One products
@@ -206,7 +206,7 @@
  */
 /**
  * @swagger
- *  /admin/products/edit/{id}:
+ *  /admin/product/edit/{id}:
  *      patch:
  *          tags: [Product(AdminPanel)]
  *          summary: create and save product

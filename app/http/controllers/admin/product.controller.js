@@ -175,26 +175,36 @@ class ProductController extends Controller {
   }
   async removeProductById(req, res, next) {
     try {
+      //first get the id param from frontend
       const { id } = req.params;
+      //then validate the id and find product based on the id
       const product = await this.findProductById(id);
+      //find the folder name that images saved in that folder
+      const imageLinkArray=(product.images?.[0])?.split("/")
+      const foldername=imageLinkArray.at((imageLinkArray.length)-2);
+      //then delete the product
       const removeProductResult = await ProductModel.deleteOne({ _id: product._id });
-      if (removeProductResult.deletedCount == 0) throw createError.InternalServerError();
+      //then check if the delete implemented or not
+      if (removeProductResult.deletedCount == 0) throw createError.InternalServerError("could not removed");
+      deleteImageFolder(foldername,"productImages")
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         data : {
-          message: "حذف محصول با موفقیت انجام شد"
+          message:"product deleted successfully"
         }
       })
     } catch (error) {
       next(error);
     }
   }
+  //first validate the id then find the product based on id
   async findProductById(productID) {
     const { id } = await idPublicValidation.validateAsync({ id: productID });
     const product = await ProductModel.findById(id);
-    if (!product) throw new createError.NotFound("محصولی یافت نشد")
+    if (!product) throw new createError.NotFound("product not found")
     return product
   }
+  //first validate the id then find the category based on id
   async findCategoryById(categoryId){
     const { id } = await idPublicValidation.validateAsync({ categoryId });
     const category = await CategoryModel.aggregate([

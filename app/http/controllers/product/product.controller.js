@@ -58,10 +58,11 @@ class ProductController extends Controller {
       next(error);
     }
   }
+  //first validate the id then find the product based on id
   async findProductById(productID) {
     const { id } = await idPublicValidation.validateAsync({ id: productID });
     const product = await ProductModel.findById(id);
-    if (!product) throw new createError.NotFound("محصولی یافت نشد")
+    if (!product) throw new createError.NotFound("product not found")
     return product
   }
 }
