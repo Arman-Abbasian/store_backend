@@ -6,7 +6,9 @@ const { uploadFile } = require("../../utils/multerCreateProduct");
 const router = require("express").Router();
 router.post("/add", stringToArray("tags", "colors"),ProductController.addProduct)
 router.delete("/remove/:id", ProductController.removeProductById)
- router.patch("/edit/:id", uploadFile.array("images", 10), stringToArray("tags", "colors"),ProductController.editProduct)
+router.patch("/edit/:id", stringToArray("tags", "colors"),ProductController.editProduct)
+router.patch("/deleteImage/:id", uploadFile.array("images", 10),ProductController.editProduct)
+router.patch("/addImages/:id", uploadFile.array("images", 10),ProductController.editProduct)
 
 // router.patch()
 // router.get()

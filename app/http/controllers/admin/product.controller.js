@@ -7,7 +7,7 @@ const { StatusCodes: HttpStatus } = require("http-status-codes");
 const { ProductModel } = require("../../../models/products");
 const { deleteFileInPublic, ListOfImagesFromRequest, copyObject, setFeatures, deleteInvalidPropertyInObject, deleteImageFolder, stringToArrayFunction } = require("../../../utils/functions");
 const { idPublicValidation } = require("../../validators/public.validation");
-const { createProductSchema } = require("../../validators/admin/product.validation");
+const { createProductSchema, editProductSchema } = require("../../validators/admin/product.validation");
 const { Controller } = require("../controller");
 const { CategoryModel } = require("../../../models/categories");
 const { uploadFile } = require("../../../utils/multerCreateProduct");
@@ -20,11 +20,6 @@ const ProductBlackList = {
   DISLIKES: "dislikes",
   COMMENTS: "comments",
   SUPPLIER: "supplier",
-  WEIGHT: "weight",
-  WIDTH: "width",
-  LENGTH: "length",
-  HEIGHT: "height",
-  COLORS: "colors"
 }
 Object.freeze(ProductBlackList)
 
@@ -154,19 +149,24 @@ class ProductController extends Controller {
   }
   async editProduct(req, res, next) {
     try {
+      //get the param id of product
       const { id } = req.params;
+      //check the validation of id and find the product in product collection
       const product = await this.findProductById(id)
+      //"copyObject" function get a clone form object=> we clone from object to protect main data that client sent"
       const data = copyObject(req.body);
-      data.images = ListOfImagesFromRequest(req?.files || [], req.body.fileUploadPath);
-      data.features = setFeatures(req.body)
+      //blackListFields is equals to ProductBlackList object
+      const validatedData=await editProductSchema.validateAsync(data) 
+      //make a blacklist of forbidden fields to edit
       let blackListFields = Object.values(ProductBlackList);
-      deleteInvalidPropertyInObject(data, blackListFields)
-      const updateProductResult = await ProductModel.updateOne({ _id: product._id }, { $set: data })
+      deleteInvalidPropertyInObject(validatedData, blackListFields)
+      validatedData.features = setFeatures(validatedData)
+      const updateProductResult = await ProductModel.updateOne({ _id: product._id }, { $set: validatedData })
       if (updateProductResult.modifiedCount == 0) throw { status: HttpStatus.INTERNAL_SERVER_ERROR, message: "خطای داخلی" }
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         data : {
-          message: "به روز رسانی باموفقیت انجام شد"
+          message: "edited successfully"
         }
       })
     } catch (error) {

@@ -132,11 +132,6 @@
  *                      type: string
  *                      description: the title of product
  *                      example: 100
- *                  images:
- *                      type: array
- *                      items:
- *                          type: string
- *                          format: binary
  *                  height:
  *                      type: string
  *                      description: the height of product packet
@@ -158,10 +153,33 @@
  *                      description: the type of product 
  *                      example: virtual - physical
  *                  colors:
- *                      $ref: '#/components/schemas/Color'
- *                      
+ *                      $ref: '#/components/schemas/Color'                      
  */
-
+/**
+ * @swagger
+ *  components:
+ *      schemas:
+ *          Edit-Product-Add-Image:
+ *              type: object
+ *              properties:
+ *                  images:
+ *                      type: array
+ *                      items:
+ *                          type: string
+ *                          format: binary                   
+ */
+/**
+ * @swagger
+ *  components:
+ *      schemas:
+ *          Edit-Product-Delete-Image:
+ *              type: object
+ *              properties:
+ *                  imageLink:
+ *                      type: string
+ *                      description: http address of image 
+ *                      example: http://localhost:5000/public/uploads/pdroductImages/145521478745/4147854125.jpg                  
+ */
 
 /**
  * @swagger
@@ -222,7 +240,64 @@
  *                  multipart/form-data:
  *                      schema:
  *                          $ref: '#/components/schemas/Edit-Product'
- *          
+ *                  application/json:
+ *                          schema:
+ *                              $ref: '#/definitions/Edit-Product' 
+ *          responses:
+ *              200:
+ *                  description: updated Product
+ *                  content:
+ *                      application/json:
+ *                          schema:
+ *                              $ref: '#/definitions/publicDefinition'
+ */
+/**
+ * @swagger
+ *  /admin/product/deleteImage/{id}:
+ *      patch:
+ *          tags: [Product(AdminPanel)]
+ *          summary: delete image product
+ *          parameters:
+ *              -   in: path
+ *                  name: id
+ *                  type: string
+ *                  required: true
+ *                  description: id of product for delete product image
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  multipart/form-data:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Edit-Product-Delete-Image'
+ *                  application/json:
+ *                          schema:
+ *                              $ref: '#/components/schemas/Edit-Product-Delete-Image' 
+ *          responses:
+ *              200:
+ *                  description: updated Product
+ *                  content:
+ *                      application/json:
+ *                          schema:
+ *                              $ref: '#/definitions/publicDefinition'
+ */
+/**
+ * @swagger
+ *  /admin/product/addImages/{id}:
+ *      patch:
+ *          tags: [Product(AdminPanel)]
+ *          summary: add product images
+ *          parameters:
+ *              -   in: path
+ *                  name: id
+ *                  type: string
+ *                  required: true
+ *                  description: id of product for update product
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  multipart/form-data:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Edit-Product-Add-Image'
  *          responses:
  *              200:
  *                  description: updated Product

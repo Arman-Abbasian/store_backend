@@ -116,15 +116,25 @@ function setFeatures(body) {
     }
     return features
 }
+
+//delete the client fields that have invalid value
 function deleteInvalidPropertyInObject(data = {}, blackListFields = []) {
-    let nullishData = ["", " ", "0", 0, null, undefined]
+    let nullishData = [null, undefined,NaN]
+    let nullishArrayElement = [null, undefined,NaN," ",""]
+    //consider each field value of each client field
     Object.keys(data).forEach(key => {
+        //if field key was equals to one the blackListFields
         if (blackListFields.includes(key)) delete data[key]
-        if (typeof data[key] == "string") data[key] = data[key].trim();
-        if (Array.isArray(data[key]) && data[key].length > 0) data[key] = data[key].map(item => item.trim())
-        if (Array.isArray(data[key]) && data[key].length == 0) delete data[key]
+        //if the field value was in nullish data array=>remove field
         if (nullishData.includes(data[key])) delete data[key];
+        //if the value of field was string=>trim the empty gap
+        if (typeof data[key] == "string") data[key] = data[key].trim();
+        //if the field was an array and length of array was at least one=>trim the empty gap of each element
+        if (Array.isArray(data[key]) && data[key].length > 0) data[key] = data[key].map(item => item.trim())
+        //if the field was an array and length of array was at least one=>delete the empty element
+        if (Array.isArray(data[key]) && data[key].length > 0) data[key] = data[key].filter(item => !nullishArrayElement.includes(item))
     })
+    return data;
 }
 function copyObject(object) {
     return JSON.parse(JSON.stringify(object))
