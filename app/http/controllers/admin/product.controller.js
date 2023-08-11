@@ -330,20 +330,51 @@ class ProductController extends Controller {
       const { id } = req.params;
       //check the validation of id and find the product in product collection
       const product = await this.findProductById(id)
-      //"copyObject" function get a clone form object=> we clone from object to protect main data that client sent"
-      const data = copyObject(req.body);
-      //blackListFields is equals to ProductBlackList object
-      const validatedData=await editProductSchema.validateAsync(data) 
-      //make a blacklist of forbidden fields to edit
-      let blackListFields = Object.values(ProductBlackList);
-      deleteInvalidPropertyInObject(validatedData, blackListFields)
-      validatedData.features = setFeatures(validatedData)
-      const updateProductResult = await ProductModel.updateOne({ _id: product._id }, { $set: validatedData })
-      if (updateProductResult.modifiedCount == 0) throw { status: HttpStatus.INTERNAL_SERVER_ERROR, message: "خطای داخلی" }
+      //"copyObject" function get a clone form object=> we clone from object 
+      //to protect main data that client sent then we want just imageLink of req.body"
+      const {imageLink} = copyObject(req.body);
+      if(!imageLink) throw createError.BadRequest("image link is not true")
+      const imageLinkArray=(imageLink)?.split("/")
+    //when split the imageLink it should be 8 element otherwise that is false
+      if(imageLinkArray.length<8|| imageLinkArray.length>8) throw createError.BadRequest("image link is not true")
+      const foldername=imageLinkArray.at((imageLinkArray.length)-2);
+      const filename=imageLinkArray.at((imageLinkArray.length)-1);
+      const fileAddress=path.join(
+        __dirname,
+        "..",
+        "..",
+        "..",
+        "..",
+        "public",
+        "uploads",
+        "productImages",
+        foldername,
+        filename
+      );
+      //check if this fileAddress is exist in project
+      const existFileAddress=fs.existsSync(fileAddress)
+      if(!existFileAddress) throw createError.BadRequest("image link is not true")
+      //check if the portlink of this image exist in imagesURL filed in DB
+    const findImageURL=product?.imagesURL
+    .find(item=>item===`${process.env.BASE_URL}:${process.env.APPLICATION_PORT}/uploads/productImages/${foldername}/${filename}`)
+    //check if the link of this image exist in images filed in DB
+    const findImage=product.images?.find(item=>item===`uploads/productImages/${foldername}/${filename}`)
+    if(!findImageURL||!findImage) throw createError.BadRequest("image link is not true")
+    //remove the imageURL values from imagesURL values in DB
+    const updatedImagesURL=product.imagesURL.filter(item=>item!==findImageURL)
+    //remove the image values from images values in DB
+    const updatedImages=product.images.filter(item=>item!==findImage)
+    //update the this two filed in db
+    if(updatedImagesURL.length===0) throw createError.BadRequest("you can not delete last image")
+    const updateProductResult = await ProductModel
+  .updateOne({ _id: product._id }, { $set: {imagesURL:updatedImagesURL,images:updatedImages} })
+      if (updateProductResult.modifiedCount == 0) throw { status: HttpStatus.INTERNAL_SERVER_ERROR, message: "sever error" }
+      //remove the file in project
+      fs.unlinkSync(fileAddress)
       return res.status(HttpStatus.OK).json({
         statusCode: HttpStatus.OK,
         data : {
-          message: "edited successfully"
+          message: "image deleted successfully"
         }
       })
     } catch (error) {
@@ -354,7 +385,6 @@ class ProductController extends Controller {
   async findProductById(productID) {
     const { id } = await idPublicValidation.validateAsync({ id: productID });
     const product = await ProductModel.findById(id);
-    console.log(product)
     if (!product) throw new createError.NotFound("product not found")
     return product
   }
