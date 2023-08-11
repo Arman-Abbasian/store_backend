@@ -1,46 +1,30 @@
 // tag1#tag2#tag_tagname#
-// string                                => [...values] || [value] || []
-
+// string   => [...values] || [value] || []
 const createError = require("http-errors")
 
 // undefined || null
+//1- change value that client send as array to array
+//2-filter the each element of array and delete bad elements
 const stringToArray = function(...args) {
+    let badValues=[""," ",null,undefined,NaN,"null","undefined","NaN"]
     return function(req, res, next) {
-       try {
-         console.log("req.body",req.body)
-        const nullishData=["0","",null,undefined," "]
+        try {
         const fields = args;
         fields.forEach(field => {
-            //if that field sent by body 
             if(req.body[field]){
-                //if the typeof that body field was string
                 if(typeof req.body[field] == "string"){
-                    //if the format of body was #tag1#tag2#tag3
                     if(req.body[field].indexOf("#") >=0){
                         req.body[field] = (req.body[field].split("#")).map(item => item.trim())
-                        //remove nullish data
-                        req.body[field]=req.body[field].filter(item=>item!==undefined||null||""||" ")
-                         //remove the repetitive  tags
-                        req.body[field] = [... new Set(req.body[field])]
-                        //if the format of body was tag1,tag2,tag3
+                        req.body[field]=req.body[field].filter(item=>!badValues.includes(item))
                     }else if(req.body[field].indexOf(",") >=0){
                         req.body[field] = (req.body[field].split(",")).map(item => item.trim())
-                        //remove nullish data
-                        req.body[field]=req.body[field].filter(item=>item!==undefined||null||""||" ")
-                         //remove the repetitive  tags
-                         console.log(req.body[field])
-                        req.body[field] = [... new Set(req.body[field])]
-                        console.log(req.body[field])
+                        req.body[field]=req.body[field].filter(item=>!badValues.includes(item))
                     }else{ 
-                        //if client send one tag=>put that tag in array
                         req.body[field] = [req.body[field]]
                     }
                 }
-                //if the format of body field was array
                 if(Array.isArray(req.body[field])){
-                    //trim the each element of array
                     req.body[field] = req.body[field].map(item => item.trim())
-                    //remove the repetitive  tags
                     req.body[field] = [... new Set(req.body[field])]
                 }
             }else{
@@ -48,10 +32,13 @@ const stringToArray = function(...args) {
             }
         })
         next()
-       } catch (error) {
-        throw createError.InternalServerError("server error")
-       }
+        } catch (error) {
+            next(error)
+        }
     }
+}
+module.exports = {
+    stringToArray
 }
 module.exports = {
     stringToArray

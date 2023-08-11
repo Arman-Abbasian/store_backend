@@ -11,6 +11,7 @@ function configApplication(app,express){
     //settings for the client send files
     app.use(express.json());
     app.use(express.urlencoded({extended:true}));
+
     //config about address for static files
     app.use(express.static(path.join(__dirname,"..","..","public")));
     // swagger config

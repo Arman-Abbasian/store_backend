@@ -93,44 +93,51 @@
  *                      $ref: '#/components/schemas/Color'
  *                      
  */
-
 /**
  * @swagger
  *  components:
  *      schemas:
  *          Edit-Product:
  *              type: object
+ *              required: 
+ *                  -   title
+ *                  -   short_text
+ *                  -   text
+ *                  -   category
+ *                  -   price
+ *                  -   discount
+ *                  -   count
  *              properties:
  *                  title:
  *                      type: string
  *                      description: the title of product
- *                      example: title of product
+ *                      example: the title of product
  *                  short_text:
  *                      type: string
- *                      description: the title of product
+ *                      description: the short_text of product
  *                      example: a short text about product
  *                  text:
  *                      type: string
- *                      description: the title of product
+ *                      description: the text of product
  *                      example: description about product
  *                  tags:
  *                      type: array
- *                      description: the title of product
+ *                      description: the tags of product
  *                  category:
  *                      type: string
- *                      description: the title of product
+ *                      description: the category of product
  *                      example: 6279e994c1e47a98d0f356d3
  *                  price:
  *                      type: string
- *                      description: the title of product
+ *                      description: the price of product
  *                      example: 2500000
  *                  discount:
  *                      type: string
- *                      description: the title of product
+ *                      description: the discount of product
  *                      example: 20
  *                  count:
  *                      type: string
- *                      description: the title of product
+ *                      description: the count of product
  *                      example: 100
  *                  height:
  *                      type: string
@@ -153,7 +160,8 @@
  *                      description: the type of product 
  *                      example: virtual - physical
  *                  colors:
- *                      $ref: '#/components/schemas/Color'                      
+ *                      $ref: '#/components/schemas/Color'
+ *                      
  */
 /**
  * @swagger
@@ -166,7 +174,8 @@
  *                      type: array
  *                      items:
  *                          type: string
- *                          format: binary                   
+ *                          format: binary  
+ *                  
  */
 /**
  * @swagger
@@ -178,9 +187,9 @@
  *                  imageLink:
  *                      type: string
  *                      description: http address of image 
- *                      example: http://localhost:5000/public/uploads/pdroductImages/145521478745/4147854125.jpg                  
+ *                      example: http://localhost:5000/public/uploads/pdroductImages/145521478745/4147854125.jpg   
+ *                
  */
-
 /**
  * @swagger
  *  /admin/product/add:
@@ -201,8 +210,8 @@
  *                      application/json:
  *                          schema:
  *                              $ref: '#/definitions/publicDefinition'
+ * 
  */
-
 /**
  * @swagger
  *  /admin/product/remove/{id}:
@@ -221,19 +230,19 @@
  *                      application/json:
  *                          schema:
  *                              $ref: '#/definitions/publicDefinition'
+ * 
  */
 /**
  * @swagger
  *  /admin/product/edit/{id}:
  *      patch:
  *          tags: [Product(AdminPanel)]
- *          summary: create and save product
+ *          summary: edit product
  *          parameters:
  *              -   in: path
  *                  name: id
  *                  type: string
- *                  required: true
- *                  description: id of product for update product
+ *                  description: objectId of product
  *          requestBody:
  *              required: true
  *              content:
@@ -241,15 +250,17 @@
  *                      schema:
  *                          $ref: '#/components/schemas/Edit-Product'
  *                  application/json:
- *                          schema:
- *                              $ref: '#/definitions/Edit-Product' 
+ *                      schema:
+ *                          $ref: '#/components/schemas/Edit-Product'
+ *          
  *          responses:
  *              200:
- *                  description: updated Product
+ *                  description: Product edited successfully
  *                  content:
  *                      application/json:
  *                          schema:
  *                              $ref: '#/definitions/publicDefinition'
+ * 
  */
 /**
  * @swagger
@@ -279,6 +290,7 @@
  *                      application/json:
  *                          schema:
  *                              $ref: '#/definitions/publicDefinition'
+ * 
  */
 /**
  * @swagger
