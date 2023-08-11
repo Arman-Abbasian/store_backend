@@ -93,6 +93,18 @@ function deleteImageFolder(folderAddress,mainFoldername) {
     }
     }
 }
+//delete just one file in a folder
+function deleteOneImageInFolder(mainFoldername,foldername,filename="10") {
+    if (foldername) {
+        //directory of saved image file
+        const pathFile = path.join(__dirname, "..", "..", "public","uploads",mainFoldername, foldername,filename)
+        console.log(pathFile)
+        //directory of saved image folder
+        if (fs.existsSync(pathFile)) {
+            fs.unlinkSync(pathFile)
+    }
+    }
+}
 //make the array of uploaded file's link 
 function ListOfImagesFromRequest(files, fileUploadPath) {
     if (files?.length > 0) {
@@ -116,7 +128,6 @@ function setFeatures(body) {
     }
     return features
 }
-
 //delete the client fields that have invalid value
 function deleteInvalidPropertyInObject(data = {}, blackListFields = []) {
     let nullishData = [null, undefined,NaN]
@@ -368,5 +379,6 @@ module.exports = {
     invoiceNumberGenerator,
     getBasketOfUser,
     deleteImageFolder,
+    deleteOneImageInFolder,
     stringToArrayFunction
 }

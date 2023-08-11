@@ -170,11 +170,9 @@
  *          Edit-Product-Add-Image:
  *              type: object
  *              properties:
- *                  images:
- *                      type: array
- *                      items:
- *                          type: string
- *                          format: binary  
+ *                  image:
+ *                      type: file
+ *                      description: the index picture of blog 
  *                  
  */
 /**
@@ -294,7 +292,7 @@
  */
 /**
  * @swagger
- *  /admin/product/addImages/{id}:
+ *  /admin/product/addImage/{id}:
  *      patch:
  *          tags: [Product(AdminPanel)]
  *          summary: add product images
