@@ -1,4 +1,5 @@
 const { default: mongoose } = require("mongoose");
+
 const { getTimeOfCourse, getTimeOfChapter } = require("../utils/functions");
 const { CommentSchema } = require("./public.schema");
 
@@ -35,7 +36,7 @@ const CourseSchema = new mongoose.Schema({
     status: {type: String, default: "notStarted" /*notStarted, Completed, Holding*/},
     //teacher is equal to owner in product schema
     teacher : {type: mongoose.Types.ObjectId, ref: "user", required : true},
-    chapters : {type: [Chapter], default: []},
+    chapters : {type: [ChapterSchema], default: []},
     students : {type : [mongoose.Types.ObjectId], default : [], ref: "user"}
 }, {
     toJSON: {
