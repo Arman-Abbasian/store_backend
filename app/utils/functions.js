@@ -6,6 +6,8 @@ const path = require("path");
 const fsExtra = require('fs-extra');
 const moment = require("moment-jalali");
 const { ACCESS_TOKEN_SECRET_KEY, REFRESH_TOKEN_SECRET_KEY } = require("./constans");
+const { idPublicValidation } = require("../http/validators/public.validation");
+const { CategoryModel } = require("../models/categories");
 
 
 //make a 5 digit number
@@ -362,6 +364,57 @@ const stringToArrayFunction = function(arrayField) {
             }
             return arrayField
     }
+async function filter(search="",category="",sort="",model){
+    let collection=[]
+    if (search) {
+        collection = await model.find({
+          $text: {$search: new RegExp(search, "ig")}})
+      } else {
+        collection = await model.find({})
+      }
+      if(category){
+            const { id } = await idPublicValidation.validateAsync({ id: category });
+            const cat = await CategoryModel.findById(id);
+            if (!category) throw new createError.BadRequest("category not found")
+            collection=collection.filter(document=>document.category.equals(cat._id))
+        
+
+      }    
+      if(sort){
+        switch (sort) {
+          case "earliest":
+            console.log("earliest")
+            collection=collection.sort(function(b,a){
+             return new Date(b.createdAt) - new Date(a.createdAt)
+            })
+            break;
+          case "most popular":
+            console.log("most popular")
+            collection=collection.sort(function(a, b){return b.numberOfLikes - a.numberOfLikes})
+            break;
+          case "most expensive":
+            console.log("most expensive")
+            collection=collection.sort(function(a, b){return b.price - a.price})
+            break;
+            case "most discount":
+            console.log("most most discount")
+            collection=collection.sort(function(a, b){return b.discount - a.discount})
+            break;
+            case "cheapest":
+              console.log("cheapest")
+              collection=collection.sort(function(a, b){return a.price - b.price})
+              break;
+          default:
+            collection
+        }
+      }else{
+        console.log("latest")
+        collection=collection.sort(function(a,b){
+         return new Date(b.createdAt) - new Date(a.createdAt)
+        })
+      }
+      return collection
+}
 module.exports = {
     RandomNumberGenerator,
     SignAccessToken,
@@ -380,5 +433,6 @@ module.exports = {
     getBasketOfUser,
     deleteImageFolder,
     deleteOneImageInFolder,
-    stringToArrayFunction
+    stringToArrayFunction,
+    filter
 }

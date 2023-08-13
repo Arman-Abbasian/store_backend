@@ -4,27 +4,15 @@ const { default: mongoose } = require("mongoose");
 
 const { CourseModel } = require("../../../models/courses");
 const { Controller } = require("../controller");
+const { filter } = require("../../../utils/functions");
 
 class CourseController extends Controller{
     async getListOfCourse(req, res, next){
         try {
-            const {search} = req.query;
-            let courses;
-            
-            if(search) courses = await CourseModel
-            .find({$text : {$search : search}})
-            .populate([
-                {path: "category", select: {title: 1}},
-                {path: "teacher", select: {first_name: 1, last_name:1, mobile:1, email: 1}}
-            ])
-            .sort({_id : -1})
-            else courses = await CourseModel
-            .find({})
-            .populate([
-                {path: "category", select: {children: 0, prent: 0}},
-                {path: "teacher", select: {first_name: 1, last_name:1, mobile:1, email: 1}}
-            ])
-            .sort({_id : -1})
+            const search = req?.query?.search || "";
+            const category = req?.query?.category || "";
+            const sort = req?.query?.sort || "";
+            const courses=await filter(search,category,sort,CourseModel)
             return res.status(HttpStatus.OK).json({
                 statusCode : HttpStatus.OK,
                 data : {

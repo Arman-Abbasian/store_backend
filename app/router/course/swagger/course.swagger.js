@@ -62,7 +62,17 @@
  *              -   in: query
  *                  name: search
  *                  type: string
- *                  description: search in course text, title, short_text
+ *                  description: text for search in title, text, short_text of (courses)
+ *              -   in: query
+ *                  name: category
+ *                  type: string
+ *                  description: select a category
+ *                  example: 64c130e16b37c59b68a033a9
+ *              -   in: query
+ *                  name: sort
+ *                  type: string
+ *                  description: sort based on ...
+ *                  example: latest-earliest-most expensive-most cheapest-most popular-most discount
  *          responses :
  *              200:
  *                  description: success

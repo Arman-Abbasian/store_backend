@@ -39,9 +39,11 @@ const CourseSchema = new mongoose.Schema({
     teacher : {type: mongoose.Types.ObjectId, ref: "user", required : true},
     chapters : {type: [ChapterSchema], default: []},
     students : {type : [mongoose.Types.ObjectId], default : [], ref: "user"}
-}, {
+},{
+    timestamps : true, 
+    //delete the __V field
+    versionKey : false,
     toJSON: {
-        versionKey:false,
         virtuals: true
     }
 });
