@@ -19,9 +19,9 @@ const ChapterSchema = new mongoose.Schema({
 })
 
 const CourseSchema = new mongoose.Schema({
-    title : {type: String, required : true},
-    short_text : {type: String, required : true},
-    text : {type: String, required : true},
+    title : {type: String,min:3,max:30, required : true},
+    short_text : {type: String,min:5,max:60, required : true},
+    text : {type: String,min:10,max:80, required : true},
     //course like product do not need many images=>one image is enough
     image : {type: String, required : true},
     tags : {type: [String], default : []},
@@ -31,6 +31,7 @@ const CourseSchema = new mongoose.Schema({
     dislikes : {type: [mongoose.Types.ObjectId], ref: "user", default : []},
     bookmarks : {type: [mongoose.Types.ObjectId], ref: "user", default : []},
     price : {type: Number, default : 0},
+    discountedPrice : {type: Number, default : 0},
     discount : {type: Number, default : 0},
     type : {type: String, default: "free"/*free, cash, special */, required : true},
     status: {type: String, default: "notStarted" /*notStarted, Completed, Holding*/},
@@ -40,6 +41,7 @@ const CourseSchema = new mongoose.Schema({
     students : {type : [mongoose.Types.ObjectId], default : [], ref: "user"}
 }, {
     toJSON: {
+        versionKey:false,
         virtuals: true
     }
 });
@@ -58,10 +60,7 @@ EpisodeSchema.virtual("chaptertotalTime").get(function(){
     return getTimeOfChapter(this.chapters || [])
 })
 //a virtual field related to the Episode schema that is the video link of each episode
-//every where that we have a image or video link =>need to make this virtual
-EpisodeSchema.virtual("videoURL").get(function(){
-    return `${process.env.BASE_URL}:${process.env.APPLICATION_PORT}/${this.videoAddress}`
-})
+
 
 module.exports = {
     CourseModel : mongoose.model("course", CourseSchema)

@@ -4,31 +4,21 @@ const fs = require("fs");
 const multer = require("multer");
 const createError = require("http-errors");
 
-const { idPublicValidation } = require("../http/validators/public.validation");
-const { ProductModel } = require("../models/products");
 
- //first validate the id then find the product based on id
- async function findProductById(productID) {
-  const { id } = await idPublicValidation.validateAsync({ id: productID });
-  const product = await ProductModel.findById(id);
-  if (!product) throw new createError.NotFound("product not found")
-  return product
-}
 //return of this function is directory of folder of upload image in project"
 function createRoute(req) {
   //make a directory address
-  console.log(req.body.foldername)
   const directory = path.join(
     __dirname,
     "..",
     "..",
     "public",
     "uploads",
-    "productImages",
+    "courseImages",
     req.body.foldername
   );
   //add a property to req.body with the name =>fileUploadPath =>have the link address of blog image until folder(with out the name of file)
-  req.body.fileUploadPath = path.join("uploads", "blogImages", req.body.foldername);
+  req.body.fileUploadPath = path.join("uploads", "courseImages", req.body.foldername);
   //make the folder in project
   // fs.mkdirSync(directory, { recursive: true });
   fs.mkdir(directory, { recursive: true }, (err) => {
@@ -45,7 +35,6 @@ const storage = multer.diskStorage({
       //create a directory in project for save file
       //and add a property to req.body with the name =>fileUploadPath that have the link address of image
       const filePath = createRoute(req);
-      console.log(filePath)
       //file path is the directory of image in project structure
       return cb(null, filePath);
     }
@@ -62,6 +51,7 @@ const storage = multer.diskStorage({
       //add a property to req.body with the name =>filename =>have the  file name of blog image
       const filename = filenamee+ext;
       req.body.filename=filename;
+      req.body.image=path.join(req.body.fileUploadPath, filename).replace(/\\/g, "/")
       //fileName is the name of the file
       return cb(null, filename);
     }
@@ -70,23 +60,17 @@ const storage = multer.diskStorage({
 });
 //check the format of image=>fileFilter is a middleware
 async function fileFilter(req, file, cb) {
-  const { id } = req.params;
-     //check the validation of id and find the product in product collection
-     const product = await findProductById(id);
-     req.body.product=product;
-     const productImageArray=product.images[0].split("/");
-     //when split the image it should be 4 element otherwise that is false
-     if(productImageArray.length !==4) throw createError.InternalServerError("server error")
-     const foldername=productImageArray.at((productImageArray.length)-2);
-    req.body.foldername=foldername
-  //extension of image
-  const ext = path.extname(file.originalname);
+  const foldername=Date.now().toString();
+  req.body.foldername=foldername;
+  if(file?.originalname){
+    const ext = path.extname(file.originalname);
   const extensions = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
   //check the format of file
   if (extensions.includes(ext)) {
     return cb(null, true);
   }
   return cb(createError.BadRequest("image format is not true"));
+  }
 }
 //check the format of video
 function videoFilter(req, file, cb) {

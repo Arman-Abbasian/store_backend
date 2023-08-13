@@ -3,7 +3,7 @@
 const createError = require("http-errors")
 
 // undefined || null
-//1- change value that client send as array to array
+//1- change value that client send as array
 //2-filter the each element of array and delete bad elements
 const stringToArray = function(...args) {
     let badValues=[""," ",null,undefined,NaN,"null","undefined","NaN"]

@@ -5,20 +5,23 @@ const {StatusCodes: HttpStatus} = require("http-status-codes");
 const createHttpError = require("http-errors");
 
 const { CourseModel } = require("../../../models/courses");
-const { copyObject, deleteInvalidPropertyInObject, deleteFileInPublic } = require("../../../utils/functions");
+const { copyObject, deleteInvalidPropertyInObject, deleteFileInPublic, deleteImageFolder } = require("../../../utils/functions");
 const { createCourseSchema } = require("../../validators/admin/course.validation");
 const { Controller } = require("../controller");
+const { CategoryModel } = require("../../../models/categories");
 
 
 class CourseController extends Controller{
     async addCourse(req, res, next){
         try {
             await createCourseSchema.validateAsync(req.body)
-            const {fileUploadPath, filename} = req.body;
-            const image = path.join(fileUploadPath, filename).replace(/\\/g, "/")
-            let {title, short_text, text, tags, category, price, discount = 0, type, discountedPrice} = req.body;
+            let {title, short_text, text, tags, category, price, discount = 0, type, discountedPrice,image} = req.body;
+            //teacher of the course is the one, that register the course
             const teacher = req.user._id
-            if(Number(price) > 0 && type === "free") throw createHttpError.BadRequest("برای دوره ی رایگان نمیتوان قیمت ثبت کرد")
+            await this.findCategoryById(category)
+            //if type field is free so =>we can not implement price for course
+            if(Number(price) > 0 && type === "free") throw createHttpError.BadRequest("free course does not have price")
+            if(Number(discount) > 0 && type === "free") throw createHttpError.BadRequest("free course does not have discount")
             const course = await CourseModel.create({
                 title, 
                 short_text, 
@@ -31,17 +34,20 @@ class CourseController extends Controller{
                 discount, 
                 type,
                 image,
-                status: "notStarted",
                 teacher 
             })
-            if(!course?._id) throw createHttpError.InternalServerError("دوره ثبت نشر=د")
+            if(!course?._id) throw createHttpError.InternalServerError("server error")
             return res.status(HttpStatus.CREATED).json({
                 statusCode: HttpStatus.CREATED,
                 data : {
-                    message : "دوره با موفقیت ایجاد شد"
+                    message : "the course added successfully"
                 }
             })
         } catch (error) {
+            console.log(req.body.foldername)
+           if(req.body?.foldername){
+            deleteImageFolder(req.body.foldername,"courseImages")
+           }
             next(error)
         }
     }
@@ -77,6 +83,12 @@ class CourseController extends Controller{
         const course = await CourseModel.findById(id);
         if(!course) throw createHttpError.NotFound("دوره ای یافت نشد");
         return course
+    }
+    async findCategoryById(id){
+        if(!mongoose.isValidObjectId(id)) throw createHttpError.BadRequest("param is not true")
+        const category = await CategoryModel.findById(id);
+        if(!category) throw createHttpError.NotFound("category not found");
+        return category
     }
     async changeCourseDiscountStatus(req, res, next) {
         try {

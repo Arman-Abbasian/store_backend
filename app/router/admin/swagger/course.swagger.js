@@ -14,6 +14,7 @@
  *                  -   true
  *                  -   false          
  */ 
+
 /**
  * {
  *  statusCode: 200,
@@ -70,7 +71,6 @@
  *                                      type: string
  *                                      example: "erfan yousefi"
  */
-
 /**
  * @swagger
  *  components:
@@ -170,7 +170,7 @@
  */
 /**
  * @swagger
- *  /admin/courses/add:
+ *  /admin/course/add:
  *      post:
  *          tags: [Course(AdminPanel)]
  *          summary: create and save course
@@ -247,40 +247,4 @@
  *                          schema:
  *                              $ref: '#/definitions/publicDefinition'
  * 
- */
-
-/**
- * @swagger
- *  /admin/courses/list:
- *      get:
- *          tags: [Course(AdminPanel)]
- *          summary: get all of courses
- *          parameters:
- *              -   in: query
- *                  name: search
- *                  type: string
- *                  description: search in course text, title, short_text
- *          responses :
- *              200:
- *                  description: success
- *                  content:
- *                      application/json:
- *                          schema:
- *                              $ref: '#/definitions/ListOfCourses'
- */
-
-/**
- * @swagger
- *  /admin/courses/{id}:
- *      get:
- *          tags: [Course(AdminPanel)]
- *          summary: get one of courses by ObjectId
- *          parameters:
- *              -   in: path
- *                  name: id
- *                  type: string
- *                  description: find course by id
- *          responses :
- *              200:
- *                  description: success
  */

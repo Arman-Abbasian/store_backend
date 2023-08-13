@@ -1,5 +1,11 @@
 /**
  * @swagger
+ *  tags:
+ *      name : course routes
+ *      description : course-routes section
+ */
+/**
+ * @swagger
  *  definitions:
  *      ListOfCourses:
  *          type: object
@@ -50,7 +56,7 @@
  * @swagger
  *  /courses/list:
  *      get:
- *          tags: [Course(AdminPanel)]
+ *          tags: [course routes]
  *          summary: get all of courses
  *          parameters:
  *              -   in: query
@@ -70,7 +76,7 @@
  * @swagger
  *  /courses/{id}:
  *      get:
- *          tags: [Course(AdminPanel)]
+ *          tags: [course routes]
  *          summary: get one of courses by ObjectId
  *          parameters:
  *              -   in: path

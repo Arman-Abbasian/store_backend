@@ -81,10 +81,10 @@ function deleteFileInPublic(fileAddress) {
     }
 }
 //if occur a error in process of upload image and image saved=>this function, delete the saved image
-function deleteImageFolder(folderAddress,mainFoldername) {
-    if (folderAddress) {
+function deleteImageFolder(foldername,mainFoldername) {
+    if (foldername) {
         //directory of saved image file
-        const pathFolder = path.join(__dirname, "..", "..", "public","uploads",mainFoldername, folderAddress)
+        const pathFolder = path.join(__dirname, "..", "..", "public","uploads",mainFoldername, foldername)
         console.log(pathFolder)
         //directory of saved image folder
         if (fs.existsSync(pathFolder)) {
