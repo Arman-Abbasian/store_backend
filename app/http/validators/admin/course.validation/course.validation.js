@@ -1,7 +1,7 @@
 const Joi = require("@hapi/joi");
 const createError = require("http-errors");
 
-const { MongoIDPattern } = require("../../../utils/constans");
+const { MongoIDPattern } = require("../../../../utils/constans");
 
 const createCourseSchema = Joi.object({
     title : Joi.string().min(3).max(30).error(createError.BadRequest("title of course is not true")),

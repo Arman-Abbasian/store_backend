@@ -6,7 +6,7 @@ const createHttpError = require("http-errors");
 
 const { CourseModel } = require("../../../../models/courses");
 const { copyObject, deleteInvalidPropertyInObject, deleteFileInPublic, deleteImageFolder } = require("../../../../utils/functions");
-const { createCourseSchema } = require("../../../validators/admin/course.validation");
+const { createCourseSchema } = require("../../../validators/admin/course.validation/course.validation");
 const { Controller } = require("../../controller");
 const { CategoryModel } = require("../../../../models/categories");
 
@@ -79,9 +79,11 @@ class CourseController extends Controller{
         }
     }
     async findCourseById(id){
-        if(!mongoose.isValidObjectId(id)) throw createHttpError.BadRequest("شناسه ارسال شده صحیح نمیباشد")
+        //check if the id is a mongoid
+        if(!mongoose.isValidObjectId(id)) throw createHttpError.BadRequest("param is not true")
+        //find the course in CourseModel
         const course = await CourseModel.findById(id);
-        if(!course) throw createHttpError.NotFound("دوره ای یافت نشد");
+        if(!course) throw createHttpError.NotFound("course is not existed");
         return course
     }
     async findCategoryById(id){

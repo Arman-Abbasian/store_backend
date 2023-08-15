@@ -16,9 +16,11 @@
  *                      example: chapter 1 zero - hero javascript
  *                  text: 
  *                      type: string
- *                      example: the describe about this chapter
+ *                      example: the description about this chapter
  *          EditChapter:
- *              type: object     
+ *              type: object
+ *              required:
+ *                  -   title      
  *              properties:
  *                  title: 
  *                      type: string
@@ -56,7 +58,7 @@
  */
 /**
  * @swagger
- *  /admin/chapter/add:
+ *  /admin/category/chapter/add:
  *      put:
  *          tags: [Chapter(AdminPanel)]
  *          summary: create new Chapter for courses
@@ -79,7 +81,7 @@
  */
 /**
  * @swagger
- *  /admin/chapter/remove/{chapterID}:
+ *  /admin/category/chapter/remove/{chapterID}:
  *      patch:
  *          tags: [Chapter(AdminPanel)]
  *          summary: remove a Chapter of courses
@@ -98,26 +100,7 @@
  */
 /**
  * @swagger
- *  /admin/chapter/remove/{chapterID}:
- *      patch:
- *          tags: [Chapter(AdminPanel)]
- *          summary: remove a Chapter of courses
- *          parameters:
- *              -   in: path
- *                  name: chapterID
- *                  type: string
- *                  required: true
- *          responses:
- *              200:
- *                  description: success
- *                  content:
- *                      application/json:
- *                          schema: 
- *                              $ref: '#/definitions/publicDefinition'
- */
-/**
- * @swagger
- *  /admin/chapter/update/{chapterID}:
+ *  /admin/category/chapter/update/{chapterID}:
  *      patch:
  *          tags: [Chapter(AdminPanel)]
  *          summary: update detail of Chapter

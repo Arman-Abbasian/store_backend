@@ -4,20 +4,31 @@ const { StatusCodes:  HttpStatus} = require("http-status-codes");
 const { deleteInvalidPropertyInObject } = require("../../../../utils/functions");
 const { CourseModel } = require("../../../../models/courses");
 const { Controller } = require("../../controller");
+const { editChapterSchema, createChapterSchema } = require("../../../validators/admin/course.validation/chapter.validation");
+const { default: mongoose } = require("mongoose");
 
 class ChapterController extends Controller{
     async addChapter(req, res, next){
         try {
+            await createChapterSchema.validateAsync(req.body)
+            //here the id of the course sent by body(not params)
             const {id, title, text} = req.body;
+            //findCourseById is a method of another calss =>so use it like under
             await CourseController.findCourseById(id)
-            const saveChapterresult = await CourseModel.updateOne({_id : id}, {$push : {
-                chapters : {title, text, episodes : []}
+            //$push is used for add a item in array in mongoDB
+            //$pull is used for remove a item in array in mongoDB
+            //and $set is for update a item in array in mongoDB
+            const saveChapterResult = await CourseModel.updateOne({_id : id}, {
+                $push : {
+                chapters : {
+                    title, text, episodes : []
+                }
             }})
-            if(saveChapterresult.modifiedCount == 0) throw createHttpError.InternalServerError('فصل افزوده نشد')
+            if(saveChapterResult.modifiedCount == 0) throw createHttpError.InternalServerError("server error")
             return res.status(HttpStatus.CREATED).json({
                 statusCode: HttpStatus.CREATED,
                 data : {
-                    message : "فصل با موفقیت ایجاد شد"
+                    message : "chapter added successfully"
                 }
             })
         } catch (error) {
@@ -27,6 +38,7 @@ class ChapterController extends Controller{
     async removeChapterById(req, res, next){
         try {
             const {chapterID} = req.params
+            //check if the chapter existed or not and if existed return that chapter
             await this.getOneChapter(chapterID);
             const removeChapterResult = await CourseModel.updateOne({"chapters._id": chapterID}, {
                 $pull : {
@@ -35,11 +47,11 @@ class ChapterController extends Controller{
                     }
                 }
             })
-            if(removeChapterResult.modifiedCount == 0) throw new createHttpError.InternalServerError("حذف فصل انجام نشد")
+            if(removeChapterResult.modifiedCount == 0) throw new createHttpError.InternalServerError("server error")
             return res.status(HttpStatus.OK).json({
                 statusCode: HttpStatus.OK,
                 data : {
-                    message: "حذف فصل با موفقیت انجام شد"
+                    message: "chapter deleted successfully"
                 }
             })
         } catch (error) {
@@ -49,24 +61,38 @@ class ChapterController extends Controller{
     async updateChapterById(req, res, next){
         try {
             const {chapterID} = req.params;
+            //check if the chapter existed or not and if existed return that chapter
             await this.getOneChapter(chapterID);
             const data = req.body;
-            deleteInvalidPropertyInObject(data, ["_id"])
+            await editChapterSchema.validateAsync(data)
+            const validatedData=deleteInvalidPropertyInObject(data, ["_id"])
+            console.log(validatedData)
             const updateChapterResult = await CourseModel.updateOne(
                 {"chapters._id" : chapterID}, 
-                {$set : { "chapters.$" : data }}
+                //in $set method the new data replace the old data(with the same name) 
+                //and the under fields remain
+                {'$set' : { "chapters.$" : validatedData }}
             )
             if(updateChapterResult.modifiedCount == 0) 
-                throw new createHttpError.InternalServerError('به روزرسانی فصل انجام نشد')
+                throw new createHttpError.InternalServerError("server error")
             return res.status(HttpStatus.OK).json({
                 statusCode: HttpStatus.OK,
                 data: {
-                    message: "به روزرسانی باموفقیت انجام شد"
+                    message: "chapter edited successfully"
                 }
             })
         } catch (error) {
             next(error)
         }
+    }
+    //this method is for find a chapter in array of chapters in a course
+    async getOneChapter(id){
+        //here instead of find a course by id find a chapter(we have array of chapters in a course document)
+        //by id
+        if(!mongoose.isValidObjectId(id)) throw createHttpError.BadRequest("param is not true")
+        const chapter = await CourseModel.findOne({"chapters._id": id}, {"chapters.$" : 1})
+        if(!chapter) throw new createHttpError.NotFound("chapter no found")
+        return chapter
     }
 }
 module.exports = {

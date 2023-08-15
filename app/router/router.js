@@ -1,8 +1,8 @@
 const { VerifyAccessToken, permission } = require("../http/middlewares/user/user.middleware");
 const { AdminBlogRoutes } = require("./admin/blog.routes");
 const { AdminCategoryRoutes } = require("./admin/category.routes");
-const { AdminChapterRoutes } = require("./admin/course/chapter.routes");
-const { AdminCourseRoutes } = require("./admin/course/course.routes");
+const { AdminChapterRoutes } = require("./admin/course.routes/chapter.routes");
+const { AdminCourseRoutes } = require("./admin/course.routes/course.routes");
 const { AdminProductRoutes } = require("./admin/product.routes");
 const { HomeRoutes } = require("./api/api.routes");
 const { BlogRoutes } = require("./blog/blog.routes");
@@ -27,7 +27,7 @@ router.use("/products", ProductRoutes)
 //all routes related to course section
 /router.use("/courses", CourseRoutes)
 //all routes related to course section
-/router.use("/category/chapters", ChapterRoutes)
+/router.use("/course/chapters", ChapterRoutes)
 //all routes related to developer section
 router.use("/developer",VerifyAccessToken, DeveloperRoutes)
 //all routes related to admin category section

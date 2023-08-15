@@ -132,7 +132,7 @@ function setFeatures(body) {
 }
 //delete the client fields that have invalid value
 function deleteInvalidPropertyInObject(data = {}, blackListFields = []) {
-    let nullishData = [null, undefined,NaN]
+    let nullishData = [null, undefined,NaN,," ",""]
     let nullishArrayElement = [null, undefined,NaN," ",""]
     //consider each field value of each client field
     Object.keys(data).forEach(key => {
