@@ -63,6 +63,7 @@ function configApplication(app,express){
               //here we introduce out strategy for authentication
               security : [{BearerAuth : [] }]
             },
+            //address of swagger files in project=> app/router/---/---.js
             apis: ["./app/router/**/*.js"],
           }),
           {explorer: true},
