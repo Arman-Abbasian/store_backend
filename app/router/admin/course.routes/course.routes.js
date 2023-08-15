@@ -1,6 +1,6 @@
-const { CourseController } = require("../../http/controllers/admin/course.controller");
-const { stringToArray } = require("../../http/middlewares/admin/stringToArray");
-const { uploadCourseImage } = require("../../utils/multerCreateCourse");
+const { CourseController } = require("../../../http/controllers/admin/course.controller/course.controller");
+const { stringToArray } = require("../../../http/middlewares/admin/stringToArray");
+const { uploadCourseImage } = require("../../../utils/multerCreateCourse");
 
 
 const router = require("express").Router();

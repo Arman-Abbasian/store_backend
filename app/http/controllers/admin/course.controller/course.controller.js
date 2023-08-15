@@ -4,11 +4,11 @@ const { default: mongoose } = require("mongoose");
 const {StatusCodes: HttpStatus} = require("http-status-codes");
 const createHttpError = require("http-errors");
 
-const { CourseModel } = require("../../../models/courses");
-const { copyObject, deleteInvalidPropertyInObject, deleteFileInPublic, deleteImageFolder } = require("../../../utils/functions");
-const { createCourseSchema } = require("../../validators/admin/course.validation");
-const { Controller } = require("../controller");
-const { CategoryModel } = require("../../../models/categories");
+const { CourseModel } = require("../../../../models/courses");
+const { copyObject, deleteInvalidPropertyInObject, deleteFileInPublic, deleteImageFolder } = require("../../../../utils/functions");
+const { createCourseSchema } = require("../../../validators/admin/course.validation");
+const { Controller } = require("../../controller");
+const { CategoryModel } = require("../../../../models/categories");
 
 
 class CourseController extends Controller{

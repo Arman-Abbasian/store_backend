@@ -56,36 +56,13 @@
  */
 /**
  * @swagger
- *  /admin/chapter/add:
- *      put:
+ *  /admin/chapter/list/{courseID}:
+ *      get:
  *          tags: [Chapter(AdminPanel)]
- *          summary: create new Chapter for courses
- *          requestBody:
- *              required: true
- *              content:
- *                  application/x-www-form-urlencoded: 
- *                      schema:
- *                          $ref: '#/components/schemas/AddChapter'
- *                  application/json: 
- *                      schema:
- *                          $ref: '#/components/schemas/AddChapter'
- *          responses:
- *              200:
- *                  description: success
- *                  content:
- *                      application/json:
- *                          schema: 
- *                              $ref: '#/definitions/publicDefinition'
- */
-/**
- * @swagger
- *  /admin/chapter/remove/{chapterID}:
- *      patch:
- *          tags: [Chapter(AdminPanel)]
- *          summary: remove a Chapter of courses
+ *          summary: get Chapters of courses
  *          parameters:
  *              -   in: path
- *                  name: chapterID
+ *                  name: courseID
  *                  type: string
  *                  required: true
  *          responses:
@@ -94,17 +71,17 @@
  *                  content:
  *                      application/json:
  *                          schema: 
- *                              $ref: '#/definitions/publicDefinition'
+ *                              $ref: '#/definitions/chaptersOfCourseDefinition'
  */
 /**
  * @swagger
- *  /admin/chapter/remove/{chapterID}:
- *      patch:
+ *  /admin/chapter/list/{courseID}:
+ *      get:
  *          tags: [Chapter(AdminPanel)]
- *          summary: remove a Chapter of courses
+ *          summary: get Chapters of courses
  *          parameters:
  *              -   in: path
- *                  name: chapterID
+ *                  name: courseID
  *                  type: string
  *                  required: true
  *          responses:
@@ -113,33 +90,5 @@
  *                  content:
  *                      application/json:
  *                          schema: 
- *                              $ref: '#/definitions/publicDefinition'
- */
-/**
- * @swagger
- *  /admin/chapter/update/{chapterID}:
- *      patch:
- *          tags: [Chapter(AdminPanel)]
- *          summary: update detail of Chapter
- *          parameters:
- *              -   in: path
- *                  name: chapterID
- *                  type: string
- *                  required: true
- *          requestBody:
- *              required: true
- *              content:
- *                  application/x-www-form-urlencoded:
- *                      schema:
- *                          $ref: '#/components/schemas/EditChapter'
- *                  application/json:
- *                      schema:
- *                          $ref: '#/components/schemas/EditChapter'
- *          responses:
- *              200:
- *                  description: success
- *                  content:
- *                      application/json:
- *                          schema: 
- *                              $ref: '#/definitions/publicDefinition'
+ *                              $ref: '#/definitions/chaptersOfCourseDefinition'
  */
