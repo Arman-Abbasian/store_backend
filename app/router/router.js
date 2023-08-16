@@ -3,12 +3,14 @@ const { AdminBlogRoutes } = require("./admin/blog.routes");
 const { AdminCategoryRoutes } = require("./admin/category.routes");
 const { AdminChapterRoutes } = require("./admin/course.routes/chapter.routes");
 const { AdminCourseRoutes } = require("./admin/course.routes/course.routes");
+const { AdminEpisodeRoutes } = require("./admin/course.routes/episode.routes");
 const { AdminProductRoutes } = require("./admin/product.routes");
 const { HomeRoutes } = require("./api/api.routes");
 const { BlogRoutes } = require("./blog/blog.routes");
 const { CategoryRoutes } = require("./category/category.routes");
 const { ChapterRoutes } = require("./course/chapter.routes");
 const { CourseRoutes } = require("./course/course.routes");
+const {episodeRoutes} = require("./course/episode.routes");
 const { DeveloperRoutes } = require("./developer/developer.routes");
 const { ProductRoutes } = require("./product/product.routes");
 const { UserRoutes } = require("./user/user.routes");
@@ -26,14 +28,18 @@ router.use("/blogs", BlogRoutes)
 router.use("/products", ProductRoutes)
 //all routes related to course section
 /router.use("/courses", CourseRoutes)
-//all routes related to course section
+//all routes related to course chapters section
 /router.use("/course/chapters", ChapterRoutes)
+//all routes related to course chapter episodes section
+/router.use("/course/chapter/episodes", episodeRoutes)
 //all routes related to developer section
 router.use("/developer",VerifyAccessToken, DeveloperRoutes)
 //all routes related to admin category section
 router.use("/admin/category",VerifyAccessToken,permission(["ADMIN",,"WRITER"]),AdminCategoryRoutes )
 //all routes related to admin category section
 router.use("/admin/category/chapter",VerifyAccessToken,permission(["ADMIN",,"WRITER"]),AdminChapterRoutes )
+//all routes related to course chapter episodes section
+/router.use("/admin/course/chapter/episodes", VerifyAccessToken,permission(["ADMIN",,"WRITER"]),AdminEpisodeRoutes)
 //all routes related to admin blog section
 router.use("/admin/blog",VerifyAccessToken,permission(["ADMIN","WRITER"]),AdminBlogRoutes )
 //all routes related to admin product section
