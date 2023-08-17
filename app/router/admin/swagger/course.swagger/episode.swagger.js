@@ -78,7 +78,7 @@
  */
 /**
  * @swagger
- *  /admin/episode/add:
+ *  /admin/course/chapter/episode/add:
  *      post:
  *          tags: [Episode(AdminPanel)]
  *          summary: create new episode for chapter
@@ -98,7 +98,7 @@
  */
 /**
  * @swagger
- *  /admin/episode/remove/{episodeID}:
+ *  /admin/course/chapter/episode/remove/{episodeID}:
  *      delete:
  *          tags: [Episode(AdminPanel)]
  *          summary: remove episode of Chapter
@@ -115,29 +115,10 @@
  *                          schema: 
  *                              $ref: '#/definitions/publicDefinition'
  */
+
 /**
  * @swagger
- *  /admin/episode/add:
- *      post:
- *          tags: [Episode(AdminPanel)]
- *          summary: create new Chapter for courses
- *          requestBody:
- *              required: true
- *              content:
- *                  multipart/form-data: 
- *                      schema:
- *                          $ref: '#/components/schemas/AddEpisode'
- *          responses:
- *              201:
- *                  description: success - created
- *                  content:
- *                      application/json:
- *                          schema: 
- *                              $ref: '#/definitions/publicDefinition'
- */
-/**
- * @swagger
- *  /admin/episode/update/{episodeID}:
+ *  /admin/course/chapter/episode/update/{episodeID}:
  *      patch:
  *          tags: [Episode(AdminPanel)]
  *          summary: edit episode of chapter

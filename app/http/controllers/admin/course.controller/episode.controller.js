@@ -1,7 +1,7 @@
 const {default: getVideoDurationInSeconds} = require("get-video-duration");
 
 const path = require("path");
-const {getTime, deleteInvalidPropertyInObject, deleteFileInPublic, copyObject} = require("../../../../utils/functions");
+const {getTime, deleteInvalidPropertyInObject, deleteFileInPublic, copyObject, deleteOneImageInNestedTwoLevelFolder} = require("../../../../utils/functions");
 
 const createHttpError = require("http-errors");
 const {StatusCodes: HttpStatus} = require("http-status-codes");
@@ -13,18 +13,13 @@ const { Controller } = require("../../controller");
 class EpisodeController extends Controller {
     async addNewEpisode(req, res, next) {
         try {
+            await createEpisodeSchema.validateAsync(req.body);
             const {
                 title,
                 text,
                 type,
-                chapterID,
-                courseID,
-                filename,
-                fileUploadPath
-            } = await createEpisodeSchema.validateAsync(req.body);
-            const fileAddress = path.join(fileUploadPath, filename)
-            const videoAddress = fileAddress.replace(/\\/g, "/");
-            const videoURL = `${process.env.BASE_URL}:${process.env.APPLICATION_PORT}/${videoAddress}`
+                videoURL
+            } = req.body
             const seconds = await getVideoDurationInSeconds(videoURL);
             const time = getTime(seconds);
             const episode = {
@@ -32,25 +27,26 @@ class EpisodeController extends Controller {
                 text,
                 type,
                 time,
-                videoAddress
+                videoURL
             }
             const createEpisodeResult = await CourseModel.updateOne({
-                _id: courseID,
-                "chapters._id": chapterID
+                _id: req.body.courseID,
+                "chapters._id": req.body.chapterID
             }, {
                 $push: {
                     "chapters.$.episodes": episode
                 }
             });
             if (createEpisodeResult.modifiedCount == 0)
-                throw new createHttpError.InternalServerError("افزودن اپیزود انجام نشد")
+                throw new createHttpError.InternalServerError("server error")
             return res.status(HttpStatus.CREATED).json({
                 statusCode: HttpStatus.CREATED,
                 data: {
-                    message: "افزودن اپیزود با موفقیت انجام شد"
+                    message: "episode created successfully"
                 }
             })
         } catch (error) {
+            deleteOneImageInNestedTwoLevelFolder("episodeVideos",req.body.courseID,req.body.chapterID,req.body.filename)
             next(error)
         }
     }

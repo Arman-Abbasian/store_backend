@@ -3,9 +3,31 @@ const fs = require("fs");
 
 const multer = require("multer");
 const createError = require("http-errors");
+const { default: mongoose } = require("mongoose");
+const { CourseModel } = require("../models/courses");
+
+async function existCourseID(id){
+  try {
+    if(!mongoose.isValidObjectId(id)) throw createError.BadRequest("courseID is not valid")
+    const course=await CourseModel.findOne({_id:id});
+  if(!course) throw createError.BadRequest("course not existed")
+  return course
+  } catch (error) {
+    throw createError.BadRequest(error.message)
+  }
+}
+async function existChapterID(id){
+  try {
+    if(!mongoose.isValidObjectId(id)) throw createError.BadRequest("chapterID is not valid")
+    const chapter=await CourseModel.findOne({"chapters._id":id});
+  if(!chapter) throw createError.BadRequest("chapter not existed")
+  return chapter
+  } catch (error) {
+    throw createError.BadRequest(error.message)
+  }
+}
 //return of this function is directory of folder of upload image in project"
 function createRoute(req) {
-  const folderName=req.body.title;
   //make a directory address
   const directory = path.join(
     __dirname,
@@ -13,13 +35,13 @@ function createRoute(req) {
     "..",
     "public",
     "uploads",
-    "blogImages",
-    folderName
+    "episodeVideos",
+    req.body.courseID,
+    req.body.chapterID
   );
   //add a property to req.body with the name =>fileUploadPath =>have the link address of blog image until folder(with out the name of file)
-  req.body.fileUploadPath = path.join("uploads", "blogImages", folderName);
+  req.body.fileUploadPath = path.join("uploads", "episodeVideos", req.body.courseID,req.body.chapterID);
   //make the folder in project
-  // fs.mkdirSync(directory, { recursive: true });
   fs.mkdir(directory, { recursive: true }, (err) => {
     if (err) throw err;
   });
@@ -41,36 +63,30 @@ const storage = multer.diskStorage({
   },
   //filename is the name of the image
   filename: (req, file, cb) => {
-    const fileNamee=req.body.title;
+    const fileName=Date.now().toString();
     //if file was uploaded
     if (file?.originalname) {
       //get the file extension(.png, .jpg, ...)
       const ext = path.extname(file.originalname);
       //make a name for file
       //add a property to req.body with the name =>filename =>have the  file name of blog image
-      const filename = fileNamee+ext;
+      const filename = fileName+ext;
       req.body.filename=filename;
       //fileName is the name of the file
+      req.body.videoURL=`${process.env.BASE_URL}:${process.env.APPLICATION_PORT}/${req.body.fileUploadPath}/${req.body.filename}`
       return cb(null, filename);
     }
     cb(null, null);
   },
 });
-//check the format of image=>fileFilter is a middleware
-function fileFilter(req, file, cb) {
-  //check the existence of title =>i check it here, because i need it for the name of the folder
-  if(!req.body.title) throw createError.BadRequest("the title of the file is required")
-  //extension of image
-  const ext = path.extname(file.originalname);
-  const extensions = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
-  //check the format of file
-  if (extensions.includes(ext)) {
-    return cb(null, true);
-  }
-  return cb(createError.BadRequest("image format is not true"));
-}
+
 //check the format of video
-function videoFilter(req, file, cb) {
+async function fileFilter(req, file, cb) {
+  console.log(req.body.courseID)
+  if (!file.originalname) throw createError.BadRequest("any video uploaded")
+  if(!req.body?.courseID || !req.body?.chapterID) throw createError.BadRequest("courseID or ChapterID not existed")
+  await existCourseID(req.body.courseID)
+  await existChapterID(req.body.chapterID)
   const ext = path.extname(file.originalname);
   const extensions = [".mp4", ".mpg", ".mov", ".avi", ".mkv"];
   if (extensions.includes(ext)) {
@@ -78,12 +94,9 @@ function videoFilter(req, file, cb) {
   }
   return cb(createError.BadRequest("video format is not true"));
 }
-const pictureMaxSize = 1 * 1000 * 1000;//1MB
 const videoMaxSize = 300 * 1000 * 1000;//300MB
 //first the fileFiler run then fileSize and then the storage section
-const uploadEpisodeImage = multer({ storage:storage, fileFilter:fileFilter, limits: { fileSize: pictureMaxSize } }); 
-const uploadEpisodeVideo = multer({ storage:storage, videoFilter:videoFilter, limits: { fileSize: videoMaxSize } }); 
+const uploadEpisodeVideo = multer({ storage:storage, fileFilter, limits: { fileSize: videoMaxSize } }); 
 module.exports = {
-  uploadEpisodeImage,
   uploadEpisodeVideo
 };

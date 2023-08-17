@@ -4,12 +4,12 @@ const { getTimeOfCourse, getTimeOfChapter } = require("../utils/functions");
 const { CommentSchema } = require("./public.schema");
 
 const EpisodeSchema = new mongoose.Schema({
-    title: {type: String, required: true},
-    text: {type: String, required: true},
+    title: {type: String,min:3,max:30 ,required: true},
+    text: {type: String,min:10,max:80, required: true},
     type: {type: String, default: "unlock"},
     time: {type: String, required : true}, 
     //link of the video=>like image
-    videoAddress: {type: String, required: true}
+    videoURL: {type: String, required: true}
 }, {toJSON: {virtuals: true}})
 
 const ChapterSchema = new mongoose.Schema({
@@ -58,8 +58,8 @@ CourseSchema.virtual("coursetotalTime").get(function(){
     return getTimeOfCourse(this.chapters || [])
 })
 //total time of all episodes of each chapter
-EpisodeSchema.virtual("chaptertotalTime").get(function(){
-    return getTimeOfChapter(this.chapters || [])
+ChapterSchema.virtual("chaptertotalTime").get(function(){
+    return getTimeOfChapter(this.episodes || [])
 })
 //a virtual field related to the Episode schema that is the video link of each episode
 

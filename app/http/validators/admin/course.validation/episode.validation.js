@@ -4,13 +4,14 @@ const createError = require("http-errors");
 const { MongoIDPattern } = require("../../../../utils/constans");
 
 const createEpisodeSchema = Joi.object({
-    title : Joi.string().min(3).max(30).error(createError.BadRequest("عنوان دوره صحیح نمیباشد")),
-    text: Joi.string().error(createError.BadRequest("متن ارسال شده صحیح نمیباشد")),
-    type: Joi.string().regex(/(lock|unlock)/i),
-    chapterID: Joi.string().regex(MongoIDPattern).error(createError.BadRequest("شناسه ی فصل صحیح نمیباشد")),
-    courseID: Joi.string().regex(MongoIDPattern).error(createError.BadRequest("شناسه ی دوره صحیح نمیباشد")),
-    filename: Joi.string().regex(/(\.mp4|\.mov|\.mkv|\.mpg)$/).error(createError.BadRequest("ویدیو ارسال شده صحیح نمیباشد")),
-    fileUploadPath : Joi.allow()
+    title : Joi.string().min(3).max(30).error(createError.BadRequest("title of episode is not true")),
+    text: Joi.string().min(10).max(80).error(createError.BadRequest("text of episode is not true")),
+    type: Joi.string().regex(/(lock|unlock)/i).error(createError.BadRequest("type of episode is not true")),
+    chapterID: Joi.string().regex(MongoIDPattern).error(createError.BadRequest("chapterID is not true")),
+    courseID: Joi.string().regex(MongoIDPattern).error(createError.BadRequest("courseID is not true")),
+    videoURL : Joi.allow(),
+    fileUploadPath:Joi.allow(),
+    filename:Joi.allow(),
 });
 
 module.exports = {

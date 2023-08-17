@@ -107,6 +107,17 @@ function deleteOneImageInFolder(mainFoldername,foldername,filename="10") {
     }
     }
 }
+//delete just one file in a folder
+function deleteOneImageInNestedTwoLevelFolder(mainFoldername,foldername1,foldername2,filename="10") {
+    if (foldername1 && foldername2) {
+        //directory of saved image file
+        const pathFile = path.join(__dirname, "..", "..", "public","uploads",mainFoldername, foldername1,foldername2,filename)
+        //directory of saved image folder
+        if (fs.existsSync(pathFile)) {
+            fs.unlinkSync(pathFile)
+    }
+    }
+}
 //make the array of uploaded file's link 
 function ListOfImagesFromRequest(files, fileUploadPath) {
     if (files?.length > 0) {
@@ -433,6 +444,7 @@ module.exports = {
     getBasketOfUser,
     deleteImageFolder,
     deleteOneImageInFolder,
+    deleteOneImageInNestedTwoLevelFolder,
     stringToArrayFunction,
     filter
 }

@@ -39,7 +39,7 @@ router.use("/admin/category",VerifyAccessToken,permission(["ADMIN",,"WRITER"]),A
 //all routes related to admin category section
 router.use("/admin/category/chapter",VerifyAccessToken,permission(["ADMIN",,"WRITER"]),AdminChapterRoutes )
 //all routes related to course chapter episodes section
-/router.use("/admin/course/chapter/episodes", VerifyAccessToken,permission(["ADMIN",,"WRITER"]),AdminEpisodeRoutes)
+/router.use("/admin/course/chapter/episode", VerifyAccessToken,permission(["ADMIN",,"WRITER"]),AdminEpisodeRoutes)
 //all routes related to admin blog section
 router.use("/admin/blog",VerifyAccessToken,permission(["ADMIN","WRITER"]),AdminBlogRoutes )
 //all routes related to admin product section
