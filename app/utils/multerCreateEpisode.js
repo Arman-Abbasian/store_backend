@@ -73,7 +73,7 @@ const storage = multer.diskStorage({
       const filename = fileName+ext;
       req.body.filename=filename;
       //fileName is the name of the file
-      req.body.videoURL=`${process.env.BASE_URL}:${process.env.APPLICATION_PORT}/${req.body.fileUploadPath}/${req.body.filename}`
+      req.body.videoURL=(`${process.env.BASE_URL}:${process.env.APPLICATION_PORT}/${req.body.fileUploadPath}/${req.body.filename}`).replace(/\\/g, "/")
       return cb(null, filename);
     }
     cb(null, null);

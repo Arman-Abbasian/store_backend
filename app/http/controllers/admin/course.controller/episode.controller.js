@@ -10,6 +10,8 @@ const { createEpisodeSchema } = require("../../../validators/admin/course.valida
 const { CourseModel } = require("../../../../models/courses");
 const { idPublicValidation } = require("../../../validators/public.validation");
 const { Controller } = require("../../controller");
+const { default: mongoose } = require("mongoose");
+const { $_createError } = require("@hapi/joi/lib/base");
 class EpisodeController extends Controller {
     async addNewEpisode(req, res, next) {
         try {
@@ -52,28 +54,28 @@ class EpisodeController extends Controller {
     }
     async removeEpisode(req, res, next) {
         try {
-            const {
-                id: episodeID
-            } = await idPublicValidation.validateAsync({
-                id: req.params.episodeID
-            });
-            await this.getOneEpisode(episodeID)
+            const {episodeID:id}=req.params
+            const {videoURL}=await this.getOneEpisode(id);
             const removeEpisodeResult = await CourseModel.updateOne({
-                "chapters.episodes._id": episodeID,
+                "chapters.episodes._id": id,
             }, {
                 $pull: {
                     "chapters.$.episodes": {
-                        _id: episodeID
+                        _id: id
                     }
                 }
             });
 
-            if (removeEpisodeResult.modifiedCount == 0)
-                throw new createHttpError.InternalServerError("حذف اپیزود انجام نشد")
+            if (removeEpisodeResult.modifiedCount == 0) throw new createHttpError.InternalServerError("server error")
+                const videoLinkArray=videoURL.split("/")
+                const foldername1=videoLinkArray.at((videoLinkArray.length)-3);
+                const foldername2=videoLinkArray.at((videoLinkArray.length)-2);
+                const filename=videoLinkArray.at((videoLinkArray.length)-1);
+                deleteOneImageInNestedTwoLevelFolder("episodeVideos",foldername1,foldername2,filename)
             return res.status(HttpStatus.OK).json({
                 statusCode: HttpStatus.OK,
                 data: {
-                    message: "حذف اپیزود با موفقیت انجام شد"
+                    message: "episode removed successfully"
                 }
             })
         } catch (error) {
@@ -82,28 +84,22 @@ class EpisodeController extends Controller {
     }
     async updateEpisode(req, res, next) {
         try {
+            //get params from client
              const {episodeID} = req.params
+             //check if the episode existed
             const episode = await this.getOneEpisode(episodeID)
-            const { filename, fileUploadPath } = req.body
-            let blackListFields = ["_id"]
-            if(filename && fileUploadPath){
-                const fileAddress = path.join(fileUploadPath, filename)
-                req.body.videoAddress = fileAddress.replace(/\\/g, "/");
-                const videoURL = `${process.env.BASE_URL}:${process.env.APPLICATION_PORT}/${req.body.videoAddress}`
-                const seconds = await getVideoDurationInSeconds(videoURL);
-                req.body.time = getTime(seconds);
-                blackListFields.push("filename")
-                blackListFields.push("fileUploadPath")
-            }else{
-                blackListFields.push("time")
-                blackListFields.push("videoAddress")
-            }
-            const data = req.body;
+            //get the body from client
+            const data = {...req.body};
+            //list of the forbidden value to change by client
+            let blackListFields = ["_id","videoURL","time"]
             deleteInvalidPropertyInObject(data, blackListFields)
+            console.log(episode)
+            console.log(data)
             const newEpisode = {
                 ...episode,
                 ...data
             }
+            console.log(newEpisode)
             const editEpisodeResult = await CourseModel.updateOne({
                 "chapters.episodes._id": episodeID
             }, {
@@ -112,11 +108,11 @@ class EpisodeController extends Controller {
                 }
             })
             if (!editEpisodeResult.modifiedCount)
-                throw new createHttpError.InternalServerError("ویرایش اپیزود انجام نشد")
+                throw new createHttpError.InternalServerError("server error")
             return res.status(HttpStatus.OK).json({
                 statusCode: HttpStatus.OK,
                 data: {
-                    message: "ویرایش اپیزود با موفقیت انجام شد"
+                    message: "episode updated successfully"
                 }
             })
         } catch (error) {
@@ -124,13 +120,15 @@ class EpisodeController extends Controller {
         }
     }
     async getOneEpisode(episodeID){
+        if(!mongoose.isValidObjectId(episodeID)) throw createHttpError.BadRequest("param is not true")
         const course = await CourseModel.findOne({"chapters.episodes._id": episodeID}, {
-            "chapters.$.episodes": 1
+            "chapters.episodes.$": 1
         })
-        if(!course) throw new createHttpError.NotFound("اپیزودی یافت نشد")
-        const episode = await course?.chapters?.[0]?.episodes?.[0]
-        if(!episode) throw new createHttpError.NotFound("اپیزودی یافت نشد")
-        return copyObject(episode)
+        if(!course) throw new createHttpError.NotFound("episode not found");
+        const episodesOfChapter = course?.chapters[0].episodes;
+        const episode=episodesOfChapter.find(obj=>obj._id.equals(episodeID))
+        if(!episode) throw new createHttpError.NotFound("episode not found")
+        return episode;
     }
 }
 module.exports = {

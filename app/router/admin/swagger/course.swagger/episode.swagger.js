@@ -71,10 +71,6 @@
  *                      enum:
  *                          -   unlock
  *                          -   lock
- *                  video: 
- *                      type: string
- *                      description: the file of video 
- *                      format: binary
  */
 /**
  * @swagger
@@ -99,7 +95,7 @@
 /**
  * @swagger
  *  /admin/course/chapter/episode/remove/{episodeID}:
- *      delete:
+ *      patch:
  *          tags: [Episode(AdminPanel)]
  *          summary: remove episode of Chapter
  *          parameters:
