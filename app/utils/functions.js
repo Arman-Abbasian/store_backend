@@ -141,7 +141,7 @@ function setFeatures(body) {
     }
     return features
 }
-//delete the client fields that have invalid value
+//delete the client fields that have invalid value or is a forbidden filed to change
 function deleteInvalidPropertyInObject(data = {}, blackListFields = []) {
     let nullishData = [null, undefined,NaN,," ",""]
     let nullishArrayElement = [null, undefined,NaN," ",""]

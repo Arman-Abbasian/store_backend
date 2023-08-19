@@ -17,6 +17,10 @@ const ChapterSchema = new mongoose.Schema({
     text: {type: String, default : ""},
     episodes : {type: [EpisodeSchema], default : []}
 })
+//total time of all episodes of each chapter
+ChapterSchema.virtual("chaptertotalTime").get(function(){
+    return getTimeOfChapter(this.episodes || [])
+})
 
 const CourseSchema = new mongoose.Schema({
     title : {type: String,min:3,max:30, required : true},
@@ -56,10 +60,6 @@ CourseSchema.virtual("imageURL").get(function(){
 //total time of all episodes in all chapters
 CourseSchema.virtual("coursetotalTime").get(function(){
     return getTimeOfCourse(this.chapters || [])
-})
-//total time of all episodes of each chapter
-ChapterSchema.virtual("chaptertotalTime").get(function(){
-    return getTimeOfChapter(this.episodes || [])
 })
 //a virtual field related to the Episode schema that is the video link of each episode
 

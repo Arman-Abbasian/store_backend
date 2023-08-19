@@ -149,10 +149,6 @@
  *                  tags:
  *                      type: array
  *                      description: the tags of course
- *                  category:
- *                      type: string
- *                      description: the cqtegory of course
- *                      example: 6279e994c1e47a98d0f356d3
  *                  price:
  *                      type: string
  *                      description: the title of course
@@ -193,7 +189,7 @@
 
 /**
  * @swagger
- *  /admin/courses/update/{id}:
+ *  /admin/course/update/{id}:
  *      patch:
  *          tags: [Course(AdminPanel)]
  *          summary: edit and save course

@@ -1,12 +1,13 @@
 const path = require("path");
+const fs=require("fs")
 const { default: mongoose } = require("mongoose");
 
 const {StatusCodes: HttpStatus} = require("http-status-codes");
 const createHttpError = require("http-errors");
 
 const { CourseModel } = require("../../../../models/courses");
-const { copyObject, deleteInvalidPropertyInObject, deleteFileInPublic, deleteImageFolder } = require("../../../../utils/functions");
-const { createCourseSchema } = require("../../../validators/admin/course.validation/course.validation");
+const { copyObject, deleteInvalidPropertyInObject, deleteFileInPublic, deleteImageFolder, deleteOneImageInFolder } = require("../../../../utils/functions");
+const { createCourseSchema, editCourseSchema } = require("../../../validators/admin/course.validation/course.validation");
 const { Controller } = require("../../controller");
 const { CategoryModel } = require("../../../../models/categories");
 
@@ -53,28 +54,35 @@ class CourseController extends Controller{
     }
     async updateCourseById(req, res, next){
         try {
+            //1- get the course id from client
             const {id} = req.params;
+            //check the 1- mongoId being and 2- existance of course in course collection
             const course = await this.findCourseById(id)
+            await editCourseSchema.validateAsync(req.body)
+            //3- clone from client data body
             const data = copyObject(req.body);
-            const {filename, fileUploadPath} = req.body;
-            let blackListFields = ["time", "chapters", "episodes", "students", "bookmarks", "likes", "dislikes", "comments", "fileUploadPath", "filename"]
-            deleteInvalidPropertyInObject(data, blackListFields)
-            if(req.file){
-                data.image = path.join(fileUploadPath, filename)
-                deleteFileInPublic(course.image)
-            }
+            console.log(data)
+            //make a list of forbidden fields to change
+            let blackListFields = ["coursetotalTime","chaptertotalTime","chapters", "episodes", "students", "bookmarks", "likes", "dislikes", "comments", "category", "teacher"]
+            const validData=deleteInvalidPropertyInObject(data, blackListFields)
             const updateCourseResult = await CourseModel.updateOne({_id: id}, {
-                $set: data
+                $set: validData
             })
-            if(!updateCourseResult.modifiedCount) throw new createHttpError.InternalServerError("به روزرسانی دوره انجام نشد")
-
+            if(!updateCourseResult.modifiedCount) throw new createHttpError.InternalServerError("server error")
+            //if the new file uploaded =>delete the previous file 
+            if(req.file){
+                deleteOneImageInFolder("courseImages",req.body.foldername,req.body.previousFilename) 
+            }
             return res.status(HttpStatus.OK).json({
                 statusCode: HttpStatus.OK,
                 data: {
-                    message: "به روزرسانی دوره با موفقیت انجام شد"
+                    message: "course updated successfully"
                 }
             })
         } catch (error) {
+            if(req.body.newFilename){
+                deleteOneImageInFolder("courseImages",req.body.foldername,req.body.newFilename)
+            }
             next(error)
         }
     }

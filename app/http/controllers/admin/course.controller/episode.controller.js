@@ -90,13 +90,12 @@ class EpisodeController extends Controller {
             const episode = await this.getOneEpisode(episodeID)
             //get the body from client
             const data = {...req.body};
+            const eepisode={...episode}
             //list of the forbidden value to change by client
             let blackListFields = ["_id","videoURL","time"]
             deleteInvalidPropertyInObject(data, blackListFields)
-            console.log(episode)
-            console.log(data)
             const newEpisode = {
-                ...episode,
+                ...eepisode._doc,
                 ...data
             }
             console.log(newEpisode)
