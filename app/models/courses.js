@@ -16,7 +16,7 @@ const ChapterSchema = new mongoose.Schema({
     title : {type: String, required : true},
     text: {type: String, default : ""},
     episodes : {type: [EpisodeSchema], default : []}
-})
+},{toJSON: {virtuals: true}})
 //total time of all episodes of each chapter
 ChapterSchema.virtual("chaptertotalTime").get(function(){
     return getTimeOfChapter(this.episodes || [])

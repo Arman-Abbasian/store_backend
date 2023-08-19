@@ -180,11 +180,15 @@ function getTime(seconds) {
     
     return (houre + ":" + minutes + ":" +second)
 }
+//get whole time of a course
 function getTimeOfCourse(chapters = []){
     let time, hour, minute, second = 0;
+    //for each chapter of course
     for (const chapter of chapters) {
         if(Array.isArray(chapter?.episodes)){
+            //for each episode of course
             for (const episode of chapter.episodes) {
+                //format of time is 00:00:00
                 if(episode?.time) time = episode.time.split(":") // [hour, min, second]
                 else time = "00:00:00".split(":")
                 //if the format of time was 00:00:00
@@ -202,6 +206,8 @@ function getTimeOfCourse(chapters = []){
             }
         }
     }
+    //here we have the whole time of a chapter as second ==>7410 second
+    //now we should change the second to 00:00:00 format (like episode section)
     hour = Math.floor(second / 3600); //convert second to hour
     minute = Math.floor(second / 60) % 60; //convert second to minutes
     second = Math.floor(second % 60); //convert seconds to second
@@ -211,10 +217,11 @@ function getTimeOfCourse(chapters = []){
     if(String(second).length ==1) second = `0${second}`
     return (hour + ":" + minute + ":" +second) 
 }
+//get whole time of chapter of a course
 function getTimeOfChapter(chapter = []){
     let time, hour, minute, second = 0;
-        if(Array.isArray(chapter?.episodes)){
-            for (const episode of chapter.episodes) {
+    //for each episode of a chapter
+            for (const episode of chapter) {
                 if(episode?.time) time = episode.time.split(":") // [hour, min, second]
                 else time = "00:00:00".split(":")
                 //if the format of time was 00:00:00
@@ -230,7 +237,6 @@ function getTimeOfChapter(chapter = []){
                     second = Number(time)
                 }
             }
-        }
     hour = Math.floor(second / 3600); //convert second to hour
     minute = Math.floor(second / 60) % 60; //convert second to minutes
     second = Math.floor(second % 60); //convert seconds to second
