@@ -5,6 +5,7 @@ const { AdminChapterRoutes } = require("./admin/course.routes/chapter.routes");
 const { AdminCourseRoutes } = require("./admin/course.routes/course.routes");
 const { AdminEpisodeRoutes } = require("./admin/course.routes/episode.routes");
 const { AdminProductRoutes } = require("./admin/product.routes");
+const { AdminUserRoutes } = require("./admin/user.routes");
 const { HomeRoutes } = require("./api/api.routes");
 const { BlogRoutes } = require("./blog/blog.routes");
 const { CategoryRoutes } = require("./category/category.routes");
@@ -35,6 +36,8 @@ router.use("/products", ProductRoutes)
 //all routes related to developer section
 router.use("/developer",VerifyAccessToken, DeveloperRoutes)
 //all routes related to admin category section
+//all routes related to admin user section
+router.use("/admin/user",VerifyAccessToken,permission(["ADMIN","WRITER"]),AdminUserRoutes )
 router.use("/admin/category",VerifyAccessToken,permission(["ADMIN",,"WRITER"]),AdminCategoryRoutes )
 //all routes related to admin category section
 router.use("/admin/category/chapter",VerifyAccessToken,permission(["ADMIN",,"WRITER"]),AdminChapterRoutes )

@@ -1,8 +1,8 @@
 const createError = require("http-errors");
 const { ROLES } = require("../../../utils/constans");
-const {SignAccessToken, VerifyRefreshToken, SignRefreshToken, getBasketOfUser } = require("../../../utils/functions");
+const {SignAccessToken, VerifyRefreshToken, SignRefreshToken, getBasketOfUser, copyObject, deleteInvalidPropertyInObject } = require("../../../utils/functions");
 const {StatusCodes : HttpStatus} = require("http-status-codes");
-const { getOtpSchema, checkOtpSchema } = require("../../validators/user/user.validation");
+const { getOtpSchema, checkOtpSchema, updateProfileSchema } = require("../../validators/user/user.validation");
 const { Controller } = require("../controller");
 const { UserModel } = require("../../../models/users");
 const { RandomNumberGenerator } = require("../../../utils/functions");
@@ -115,6 +115,42 @@ class UserController extends Controller {
       Role: ROLES.USER
     }))
   }
+  //update the profile of user
+  async updateUserProfile(req, res, next){
+    try {
+        const userID = req.user._id;
+        await updateProfileSchema.validateAsync(req.body)
+        const data = copyObject(req.body);
+        const BlackListFields = ["mobile", "otp", "bills", "discount", "Role", "Courses","products","_id","refreshToken","basket"]
+        const validateData=deleteInvalidPropertyInObject(data, BlackListFields)
+        const profileUpdateResult = await UserModel.updateOne({_id: userID}, { $set: validateData })
+        if(!profileUpdateResult.modifiedCount) throw new createError.InternalServerError("server error")
+        return res.status(HttpStatus.OK).json({
+            statusCode: HttpStatus.OK,
+            data: {
+                message: "profile updated successfully"
+            }
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+//get the profile of user
+async userProfile(req, res, next){
+    try {
+        const user = req.user;
+        //bill, courses, discount, 
+        console.log(await getBasketOfUser(user._id));
+        return res.status(HttpStatus.OK).json({
+            statusCode: HttpStatus.OK,
+            data: {
+                user
+            }
+        })
+    } catch (error) {
+        next(error)
+    }
+}
   // the return of this function is the user data (if exist)
   async checkExistUser(mobile) {
     const user = await UserModel.findOne({ mobile });
