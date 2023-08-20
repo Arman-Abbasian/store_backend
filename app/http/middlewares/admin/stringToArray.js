@@ -14,17 +14,19 @@ const stringToArray = function(...args) {
             if(req.body[field]){
                 if(typeof req.body[field] == "string"){
                     if(req.body[field].indexOf("#") >=0){
-                        req.body[field] = (req.body[field].split("#")).map(item => item.trim())
-                        req.body[field]=req.body[field].filter(item=>!badValues.includes(item))
+                        req.body[field] = (req.body[field].split("#"))   
                     }else if(req.body[field].indexOf(",") >=0){
-                        req.body[field] = (req.body[field].split(",")).map(item => item.trim())
-                        req.body[field]=req.body[field].filter(item=>!badValues.includes(item))
+                        req.body[field] = (req.body[field].split(","))
                     }else{ 
                         req.body[field] = [req.body[field]]
                     }
                 }
                 if(Array.isArray(req.body[field])){
+                    //remove the gap from start and end of each element
                     req.body[field] = req.body[field].map(item => item.trim())
+                    //remove each element of array that contain one of bad values
+                    req.body[field]=req.body[field].filter(item=>!badValues.includes(item))
+                    //remove the duplicate value
                     req.body[field] = [... new Set(req.body[field])]
                 }
             }else{

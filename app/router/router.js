@@ -1,4 +1,6 @@
 const { VerifyAccessToken, permission } = require("../http/middlewares/user/user.middleware");
+const { AdminRBACPermissionRoutes } = require("./admin/RBAC/permission");
+const { AdminRBACRoleRoutes } = require("./admin/RBAC/role");
 const { AdminBlogRoutes } = require("./admin/blog.routes");
 const { AdminCategoryRoutes } = require("./admin/category.routes");
 const { AdminChapterRoutes } = require("./admin/course.routes/chapter.routes");
@@ -35,9 +37,13 @@ router.use("/products", ProductRoutes)
 /router.use("/course/chapter/episodes", episodeRoutes)
 //all routes related to developer section
 router.use("/developer",VerifyAccessToken, DeveloperRoutes)
-//all routes related to admin category section
+//all routes related to RBAC role
+router.use("/admin/RBAC/role",VerifyAccessToken,permission(["ADMIN","WRITER"]),AdminRBACRoleRoutes)
+//all routes related to RBAC permission
+router.use("/admin/RBAC/permission",VerifyAccessToken,permission(["ADMIN","WRITER"]),AdminRBACPermissionRoutes)
 //all routes related to admin user section
 router.use("/admin/user",VerifyAccessToken,permission(["ADMIN","WRITER"]),AdminUserRoutes )
+//all routes related to admin category section
 router.use("/admin/category",VerifyAccessToken,permission(["ADMIN",,"WRITER"]),AdminCategoryRoutes )
 //all routes related to admin category section
 router.use("/admin/category/chapter",VerifyAccessToken,permission(["ADMIN",,"WRITER"]),AdminChapterRoutes )
