@@ -18,9 +18,9 @@
  *                                  _id:
  *                                      type: string
  *                                      example: "62822e4ff68cdded54aa928d"
- *                                  title:
+ *                                  name:
  *                                      type: string
- *                                      example: "title of permission"
+ *                                      example: "name of permission"
  *                                  description:
  *                                      type: string
  *                                      example: "desc of permission"
@@ -30,7 +30,7 @@
  * @swagger
  *  components:
  *      schemas:
- *          Permission:
+ *          Create-Permission:
  *              type: object
  *              required:
  *                  -   name
@@ -59,10 +59,10 @@
  */
 /**
  * @swagger
- *  /admin/permission/list:
+ *  /admin/RBAC/permission/list:
  *      get:
  *          tags: [RBAC(AdminPanel)]
- *          summary: cget all Permissions    
+ *          summary: get all Permissions    
  *          responses:
  *              200:
  *                  description: get all permissions
@@ -74,7 +74,7 @@
  */
 /**
  * @swagger
- *  /admin/permission/add:
+ *  /admin/RBAC/permission/add:
  *      post:
  *          tags: [RBAC(AdminPanel)]
  *          summary: create new Permission
@@ -83,7 +83,10 @@
  *              content:
  *                  application/x-www-form-urlencoded:
  *                      schema:
- *                          $ref: '#/components/schemas/Permission'
+ *                          $ref: '#/components/schemas/Create-Permission'
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Create-Permission'
  *          
  *          responses:
  *              201:
@@ -96,7 +99,7 @@
  */
 /**
  * @swagger
- *  /admin/permission/update/{id}:
+ *  /admin/RBAC/permission/update/{id}:
  *      patch:
  *          tags: [RBAC(AdminPanel)]
  *          summary: edit the Permission
@@ -111,6 +114,9 @@
  *                  application/x-www-form-urlencoded:
  *                      schema:
  *                          $ref: '#/components/schemas/Edit-Permission'
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Edit-Permission'
  *          
  *          responses:
  *              200:
@@ -123,7 +129,7 @@
  */
 /**
  * @swagger
- *  /admin/permission/remove/{id}:
+ *  /admin/RBAC/permission/remove/{id}:
  *      delete:
  *          tags: [RBAC(AdminPanel)]
  *          summary: remove the Permission

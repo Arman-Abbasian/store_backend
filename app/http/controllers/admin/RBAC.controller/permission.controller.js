@@ -4,7 +4,8 @@ const createHttpError = require("http-errors");
 const { PermissionsModel } = require("../../../../models/permission")
 const { copyObject, deleteInvalidPropertyInObject } = require("../../../../utils/functions");
 const { Controller } = require("../../controller");
-const { addPermissionSchema } = require("../../../validators/admin/RBAC.validation/permission.validation");
+const { addPermissionSchema, editPermissionSchema } = require("../../../validators/admin/RBAC.validation/permission.validation");
+const { default: mongoose } = require("mongoose");
 
 class PermissionControlller extends Controller {
     async getAllPermissions(req, res, next){
@@ -25,11 +26,11 @@ class PermissionControlller extends Controller {
             const {id} = req.params;
             await this.findPermissionWithID(id)
             const removePermissionResult = await PermissionsModel.deleteOne({_id: id})
-            if(!removePermissionResult.deletedCount) throw createHttpError.InternalServerError("دسترسی حذف نشد")
+            if(!removePermissionResult.deletedCount) throw createHttpError.InternalServerError("server error")
             return res.status(HttpStatus.OK).json({
                 statusCode: HttpStatus.OK,
                 data: {
-                    message: "دسترسی با موفقیت حذف شد"
+                    message: "permission removed successfully"
                 }
             })
         } catch (error) {
@@ -39,13 +40,14 @@ class PermissionControlller extends Controller {
     async createNewPermission(req,res, next){
         try {
             const {name, description} = await addPermissionSchema.validateAsync(req.body);
+            //check if the name is exist before(because name must be unique)
             await this.findPermissionWithName(name)
             const permission = await PermissionsModel.create({ name, description })
-            if(!permission) throw createHttpError.InternalServerError("دسترسی ایجاد نشد")
+            if(!permission) throw createHttpError.InternalServerError("server error")
             return res.status(HttpStatus.CREATED).json({
                 statusCode: HttpStatus.CREATED,
                 data : {
-                    message: "دسترسی باموفقیت ایجاد شد"
+                    message: "permission created successfully"
                 }
             })
         } catch (error) {
@@ -56,16 +58,17 @@ class PermissionControlller extends Controller {
         try {
             const {id} = req.params;
             await this.findPermissionWithID(id)
+            await editPermissionSchema.validateAsync(req.body)
             const data = copyObject(req.body)
-            deleteInvalidPropertyInObject(data, [])
+            const validData=deleteInvalidPropertyInObject(data, ["_id"])
             const updatePermissionResult = await PermissionsModel.updateOne({_id : id}, {
-                $set: data
+                $set: validData
             });
-            if(!updatePermissionResult.modifiedCount) throw createHttpError.InternalServerError("ویرایش سطح انجام نشد")
+            if(!updatePermissionResult.modifiedCount) throw createHttpError.InternalServerError("server error")
             return res.status(HttpStatus.OK).json({
                 statusCode: HttpStatus.OK,
                 data : {
-                    message: "ویرایش سطح با موفقیت انجام شد"
+                    message: "permission edited successfully"
                 }
             })
         } catch (error) {
@@ -74,11 +77,12 @@ class PermissionControlller extends Controller {
     }
     async findPermissionWithName(name){
         const permission =  await PermissionsModel.findOne({name});
-        if(permission) throw createHttpError.BadRequest("دسترسی قبلا ثبت شده")
+        if(permission) throw createHttpError.BadRequest("name is existed before")
     }
     async findPermissionWithID(_id){
+        if(!mongoose.isValidObjectId(_id)) throw createHttpError.BadRequest("param is not true")
         const permission =  await PermissionsModel.findOne({_id});
-        if(!permission) throw createHttpError.NotFound("دسترسی یافت نشد")
+        if(!permission) throw createHttpError.NotFound("permission not found")
         return permission
     }
 }
