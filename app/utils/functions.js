@@ -142,6 +142,7 @@ function setFeatures(body) {
     return features
 }
 //delete the client fields that have invalid value or is a forbidden filed to change
+//and for array 1-trim each element value,2-delete bad value, 3-delete duplicate value
 function deleteInvalidPropertyInObject(data = {}, blackListFields = []) {
     let nullishData = [null, undefined,NaN,," ",""]
     let nullishArrayElement = [null, undefined,NaN," ",""]
@@ -157,6 +158,8 @@ function deleteInvalidPropertyInObject(data = {}, blackListFields = []) {
         if (Array.isArray(data[key]) && data[key].length > 0) data[key] = data[key].map(item => item.trim())
         //if the field was an array and length of array was at least one=>delete the empty element
         if (Array.isArray(data[key]) && data[key].length > 0) data[key] = data[key].filter(item => !nullishArrayElement.includes(item))
+        //if the field was an array and length of array was at least one=>delete the duplicate element
+        if (Array.isArray(data[key]) && data[key].length > 0) data[key] = [...new Set(data[key])]
     })
     return data;
 }

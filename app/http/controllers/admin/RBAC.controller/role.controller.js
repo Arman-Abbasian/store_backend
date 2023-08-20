@@ -4,7 +4,7 @@ const { default: mongoose } = require("mongoose");
 
 const { RoleModel } = require("../../../../models/role")
 const { copyObject, deleteInvalidPropertyInObject } = require("../../../../utils/functions");
-const { addRoleSchema } = require("../../../validators/admin/RBAC.validation/role.validation");
+const { addRoleSchema,editRoleSchema } = require("../../../validators/admin/RBAC.validation/role.validation");
 const { Controller } = require("../../controller");
 
 class RoleControlller extends Controller {
@@ -23,14 +23,16 @@ class RoleControlller extends Controller {
     }
     async createNewRole(req,res, next){
         try {
-            const {title, permissions} = await addRoleSchema.validateAsync(req.body);
-            await this.findRoleWithTitle(title)
-            const role = await RoleModel.create({ title, permissions })
-            if(!role) throw createHttpError.InternalServerError("نقش ایجاد نشد")
+            //1- validate the client data body
+            const {title,description, permissions} = await addRoleSchema.validateAsync(req.body);
+            //check the title is repetitiv or not
+            await this.checkIfTitleIsRepetitiv(title)
+            const role = await RoleModel.create({ title,description, permissions })
+            if(!role) throw createHttpError.InternalServerError("server error")
             return res.status(HttpStatus.CREATED).json({
                 statusCode: HttpStatus.CREATED,
                 data : {
-                    message: "نقش باموفقیت ایجاد شد"
+                    message: "role made successfully"
                 }
             })
         } catch (error) {
@@ -42,11 +44,11 @@ class RoleControlller extends Controller {
             const {field} = req.params;
             const role = await this.findRoleWithIdOrTitle(field)
             const removeRoleResult = await RoleModel.deleteOne({_id : role._id});
-            if(!removeRoleResult.deletedCount) throw createHttpError.InternalServerError("حذف نقش انجام نشد")
+            if(!removeRoleResult.deletedCount) throw createHttpError.InternalServerError("server error")
             return res.status(HttpStatus.OK).json({
                 statusCode: HttpStatus.OK,
                 data : {
-                    message: "حذف نقش با موفقیت انجام شد"
+                    message: "role deleted successfully"
                 }
             })
         } catch (error) {
@@ -55,32 +57,40 @@ class RoleControlller extends Controller {
     }
     async updateRoleByID(req, res, next){
         try {
+            //get the params from client
             const {id} = req.params;
+            //find the role in DB with title or _id of a role
             const role = await this.findRoleWithIdOrTitle(id)
+            //get a clone from sent body data
             const data = copyObject(req.body)
-            deleteInvalidPropertyInObject(data, [])
+            //validation the data
+            await editRoleSchema.validateAsync(data)
+            //remove the bad value(in string fields and array fields) and remove forbidden fields
+            const validData=deleteInvalidPropertyInObject(data, ["_id"])
             const updateRoleResult = await RoleModel.updateOne({_id : role._id}, {
-                $set: data
+                $set: validData
             });
-            if(!updateRoleResult.modifiedCount) throw createHttpError.InternalServerError("ویرایش نقش انجام نشد")
+            if(!updateRoleResult.modifiedCount) throw createHttpError.InternalServerError("server error")
             return res.status(HttpStatus.OK).json({
                 statusCode: HttpStatus.OK,
                 data : {
-                    message: "ویرایش نقش با موفقیت انجام شد"
+                    message: "role edited successfully"
                 }
             })
         } catch (error) {
             next(error)
         }
     }
-    async findRoleWithTitle(title){
+    //check if the title exist before or not
+    async checkIfTitleIsRepetitiv(title){
         const role =  await RoleModel.findOne({title});
-        if(role) throw createHttpError.BadRequest("نقش یا رول  قبلا ثبت شده")
+        if(role) throw createHttpError.BadRequest("title existed before")
     } 
+//because here title is also unique=> we can use _id or title to find in DB
     async findRoleWithIdOrTitle(field){
         let findQuery = mongoose.isValidObjectId(field)? {_id: field} : {title: field}
         const role = await RoleModel.findOne(findQuery)
-        if(!role) throw createHttpError.NotFound("نقش مورد نظر یافت نشد")
+        if(!role) throw createHttpError.NotFound("role no found")
         return role
     }
 }

@@ -1,6 +1,6 @@
 const { VerifyAccessToken, permission } = require("../http/middlewares/user/user.middleware");
-const { AdminRBACPermissionRoutes } = require("./admin/RBAC/permission");
-const { AdminRBACRoleRoutes } = require("./admin/RBAC/role");
+const { AdminRBACPermissionRoutes } = require("./admin/RBAC.routes/permission.routes");
+const { AdminRBACRoleRoutes } = require("./admin/RBAC.routes/role.routes");
 const { AdminBlogRoutes } = require("./admin/blog.routes");
 const { AdminCategoryRoutes } = require("./admin/category.routes");
 const { AdminChapterRoutes } = require("./admin/course.routes/chapter.routes");

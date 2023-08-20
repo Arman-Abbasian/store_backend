@@ -1,4 +1,3 @@
-
 /**
  * @swagger
  *  definitions:
@@ -80,7 +79,7 @@
  */
 /**
  * @swagger
- *  /admin/role/list:
+ *  /admin/RBAC/role/list:
  *      get:
  *          tags: [RBAC(AdminPanel)]
  *          summary: get all Role      
@@ -95,7 +94,7 @@
  */
 /**
  * @swagger
- *  /admin/role/add:
+ *  /admin/RBAC/role/add:
  *      post:
  *          tags: [RBAC(AdminPanel)]
  *          summary: create new Role
@@ -105,6 +104,9 @@
  *                  application/x-www-form-urlencoded:
  *                      schema:
  *                          $ref: '#/components/schemas/Role'
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Role' 
  *          
  *          responses:
  *              201:
@@ -117,7 +119,7 @@
  */
 /**
  * @swagger
- *  /admin/role/update/{id}:
+ *  /admin/RBAC/role/update/{id}:
  *      patch:
  *          tags: [RBAC(AdminPanel)]
  *          summary: edit the Role
@@ -132,7 +134,9 @@
  *                  application/x-www-form-urlencoded:
  *                      schema:
  *                          $ref: '#/components/schemas/Edit-Role'
- *          
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Edit-Role'     
  *          responses:
  *              200:
  *                  description: edited the Role
@@ -144,7 +148,7 @@
  */
 /**
  * @swagger
- *  /admin/role/remove/{field}:
+ *  /admin/RBAC/role/remove/{field}:
  *      delete:
  *          tags: [RBAC(AdminPanel)]
  *          summary: remove the Role
