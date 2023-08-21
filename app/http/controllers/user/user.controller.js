@@ -112,6 +112,7 @@ class UserController extends Controller {
     return (await UserModel.create({
       mobile,
       otp,
+      //as default all users are USER role
       Role: ROLES.USER
     }))
   }
