@@ -1,7 +1,7 @@
 const { GraphQLList, GraphQLString, GraphQLInt } = require("graphql");
-const { VerifyAccessTokenInGraphQL } = require("../../http/middlewares/verifyAccessToken");
+const { VerifyAccessTokenInGraphQL } = require("../../http/middlewares/user/user.middleware");
 const { BlogModel } = require("../../models/blogs");
-const { CourseModel } = require("../../models/course");
+const { CourseModel } = require("../../models/courses");
 const { ProductModel } = require("../../models/products");
 const { UserModel } = require("../../models/users");
 const { BlogType } = require("../typeDefs/blog.type");

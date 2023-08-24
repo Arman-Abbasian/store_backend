@@ -1,14 +1,15 @@
 const { GraphQLString } = require("graphql");
 const createHttpError = require("http-errors");
-const { VerifyAccessTokenInGraphQL } = require("../../http/middlewares/verifyAccessToken");
+
 const { BlogModel } = require("../../models/blogs");
 const {StatusCodes: HttpStatus} = require("http-status-codes");
 const { ResponseType } = require("../typeDefs/public.types");
 const { copyObject } = require("../../utils/functions");
 const { default: mongoose } = require("mongoose");
-const { CourseModel } = require("../../models/course");
+const { CourseModel } = require("../../models/courses");
 const { ProductModel } = require("../../models/products");
 const { checkExistCourse, checkExistProduct, checkExistBlog } = require("../utils");
+const { VerifyAccessTokenInGraphQL } = require("../../http/middlewares/user/user.middleware");
 const CreateCommentForBlog = {
     type: ResponseType,
     args : {

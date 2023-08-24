@@ -1,7 +1,7 @@
 const {Kind} = require("graphql");
 const createHttpError = require("http-errors");
 const { BlogModel } = require("../models/blogs");
-const { CourseModel } = require("../models/course");
+const { CourseModel } = require("../models/courses");
 const { ProductModel } = require("../models/products");
 
 function parseObject(valueNode) {

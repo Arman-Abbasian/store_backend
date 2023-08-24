@@ -1,5 +1,5 @@
 const { GraphQLList, GraphQLString } = require("graphql")
-const { CourseModel } = require("../../models/course");
+const { CourseModel } = require("../../models/courses");
 const { CourseType } = require("../typeDefs/course.type");
 
 const CourseResolver = {

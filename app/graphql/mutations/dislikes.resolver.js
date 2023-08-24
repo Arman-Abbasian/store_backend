@@ -2,10 +2,11 @@ const { GraphQLString } = require("graphql");
 const { ProductModel } = require("../../models/products");
 const { ResponseType } = require("../typeDefs/public.types");
 const {StatusCodes: HttpStatus} = require("http-status-codes");
-const { VerifyAccessTokenInGraphQL } = require("../../http/middlewares/verifyAccessToken");
-const { CourseModel } = require("../../models/course");
+
+const { CourseModel } = require("../../models/courses");
 const { BlogModel } = require("../../models/blogs");
 const { checkExistBlog, checkExistCourse, checkExistProduct } = require("../utils");
+const { VerifyAccessTokenInGraphQL } = require("../../http/middlewares/user/user.middleware");
 
 const DisLikeProduct = {
     type: ResponseType,

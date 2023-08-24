@@ -1,4 +1,6 @@
+const { graphqlHTTP } = require("express-graphql");
 const { VerifyAccessToken, permission } = require("../http/middlewares/user/user.middleware");
+const { graphqlConfig } = require("../utils/graphql.config");
 const { AdminRBACPermissionRoutes } = require("./admin/RBAC.routes/permission.routes");
 const { AdminRBACRoleRoutes } = require("./admin/RBAC.routes/role.routes");
 const { AdminBlogRoutes } = require("./admin/blog.routes");
@@ -55,7 +57,8 @@ router.use("/admin/blog",VerifyAccessToken,AdminBlogRoutes )
 router.use("/admin/product",VerifyAccessToken,AdminProductRoutes )
 //all routes related to admin course section
 router.use("/admin/course",VerifyAccessToken,AdminCourseRoutes )
-
+//all routes related to graphql section
+router.use("/graphql", graphqlHTTP(graphqlConfig))
 
 //all routes existed now in AllRoutes
 module.exports = {
