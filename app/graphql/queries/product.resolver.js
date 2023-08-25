@@ -3,6 +3,7 @@ const { ProductModel } = require("../../models/products")
 const { ProductType } = require("../typeDefs/product.type");
 
 const ProductResolver = {
+    //an array of ProductType object
     type : new GraphQLList(ProductType),
     args : {
         category : {type : GraphQLString}

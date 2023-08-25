@@ -1,11 +1,12 @@
 {
-  products{
+  products {
     _id
     title
     imagesURL
     short_text
     text
     tags
+    colors
     supplier {
       first_name
       last_name
@@ -18,11 +19,9 @@
       height
       width
       weight
-      colors
       length
-      
     }
-    comments{
+    comments {
       _id
       comment
       user {
