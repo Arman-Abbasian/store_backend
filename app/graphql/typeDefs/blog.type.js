@@ -2,6 +2,7 @@ const { GraphQLObjectType, GraphQLString, GraphQLList } = require("graphql");
 const { CommentType } = require("./comment.type");
 const { UserType, PublicCategoryType } = require("./public.types");
 
+// here we define the type of each data for blog collection
 const BlogType = new GraphQLObjectType({
     name: "blogType",
     fields: {
