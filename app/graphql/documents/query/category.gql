@@ -1,3 +1,4 @@
+//get all parent category
 {
   categories  {
     _id
@@ -9,6 +10,7 @@
   }
 }
 
+//get the children of one category
 {
   childOfCategory (parent : "6279e994c1e47a98d0f356d3") {
     _id
