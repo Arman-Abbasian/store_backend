@@ -20,6 +20,7 @@ const RootQuery = new GraphQLObjectType({
         //category query have two section :1- get the all parent category, 2-get the children of one category
         categories : CategoriesParentResolver,
         childOfCategory : CategoryChildResolver,
+        //list of all courses
         courses : CourseResolver,
         getUserBookmarkedBlogs,
         getUserBookmarkedCourses,

@@ -1,6 +1,7 @@
 const { GraphQLString, GraphQLObjectType, GraphQLList, GraphQLScalarType, Kind } = require("graphql");
 const { toObject, parseLiteral } = require("../utils");
 
+//AnyType use for nested data =>(like category section)
 const AnyType = new GraphQLScalarType({
     name: "anyType",
     parseValue : toObject,

@@ -1,5 +1,5 @@
- {
-  courses(category : "6279e9afc1e47a98d0f356d6") {
+{
+  courses(category: "6279e9afc1e47a98d0f356d6") {
     _id
     title
     text
@@ -7,6 +7,7 @@
     short_text
     price
     discount
+    coursetotalTime
     category {
       _id
       title
@@ -17,8 +18,10 @@
     }
     chapters {
       title
+      chaptertotalTime
       episodes {
         title
+        time
       }
     }
     comments {
@@ -28,10 +31,10 @@
         first_name
         last_name
       }
-      answers{
+      answers {
         _id
         comment
-        user{
+        user {
           first_name
           last_name
         }

@@ -1,6 +1,8 @@
 const { GraphQLObjectType, GraphQLString, GraphQLList, GraphQLInt } = require("graphql");
+
 const { CommentType } = require("./comment.type");
 const { UserType, PublicCategoryType } = require("./public.types");
+
 const EpisodeTypes = new GraphQLObjectType({
     name: "EpisodeTypes",
     fields: {
@@ -9,7 +11,6 @@ const EpisodeTypes = new GraphQLObjectType({
         text: {type : GraphQLString},
         type: {type : GraphQLString},
         time: {type : GraphQLString},
-        videoAddress : {type : GraphQLString},
         videoURL : {type : GraphQLString}
     }
 })
@@ -19,6 +20,7 @@ const ChaptersType = new GraphQLObjectType({
         _id: {type: GraphQLString},
         title : {type : GraphQLString},
         text : {type : GraphQLString},
+        chaptertotalTime:{type:GraphQLString},
         episodes : {type : new GraphQLList(EpisodeTypes)},
     }
 })
@@ -29,7 +31,6 @@ const CourseType = new GraphQLObjectType({
         title : {type : GraphQLString},
         short_text : {type : GraphQLString},
         text : {type : GraphQLString},
-        image : {type : GraphQLString},
         imageURL : {type : GraphQLString},
         tags : {type : new GraphQLList(GraphQLString)},
         category : {type : PublicCategoryType},
@@ -40,6 +41,7 @@ const CourseType = new GraphQLObjectType({
         status : {type: GraphQLString},
         teacher : {type : UserType},
         chapters : {type: new GraphQLList(ChaptersType)},
+        coursetotalTime:{type:GraphQLString},
         comments : {type: new GraphQLList(CommentType)},
         likes : {type: new GraphQLList(UserType)},
         dislikes : {type: new GraphQLList(UserType)},
