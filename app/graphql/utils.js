@@ -4,8 +4,11 @@ const { BlogModel } = require("../models/blogs");
 const { CourseModel } = require("../models/courses");
 const { ProductModel } = require("../models/products");
 
+//this section run when the type is equals to object
 function parseObject(valueNode) {
+    //the under line means that=>const value={}
     const value = Object.create(null);
+    //for each value of each key of the object
     valueNode.fields.forEach(field => {
         value[field.name.value] = parseValueNode(field.value)
     })
@@ -22,6 +25,7 @@ function parseValueNode(valueNode) {
         case Kind.OBJECT:
             return parseObject(valueNode.value)
         case Kind.LIST:
+            //if the valueNode.value was Array=>for each element of the array run parseValueNode function
             return valueNode.values.map(parseValueNode)
         default:
             return null;
@@ -29,19 +33,22 @@ function parseValueNode(valueNode) {
 }
 function parseLiteral(valueNode){
     switch(valueNode.kind) {
+        //if the type was string
         case Kind.STRING:
             return valueNode.value.charAt(0) === '{'? JSON.parse(valueNode.value): valueNode.value
+            //if the type was integer of float
         case Kind.INT:
         case Kind.FLOAT:
             return Number(valueNode.value)
-        case Kind.OBJECT: 
-                
+        case Kind.OBJECT:           
     }
 }
+//this function return a object
 function toObject(value){
     if(typeof value === 'object'){
         return value
     }
+    //this means the json object format => "{"ddd":"dsfsf","sffsf":"dsfsfsf"}"
     if(typeof value === "string" && value.charAt(0) === "{"){
         return JSON.parse(value)
     }

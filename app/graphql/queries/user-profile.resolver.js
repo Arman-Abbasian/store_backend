@@ -60,6 +60,8 @@ const getUserBookmarkedCourses = {
         return courses
     }
 }
+//in graphql like the restfull API we do not have the middlewares and have to do all checks, validations,
+//search in db and ... in resolve section completely
 const getUserBasket = {
     type : AnyType,
     resolve : async (_, args, context) => {

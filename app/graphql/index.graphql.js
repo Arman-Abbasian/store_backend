@@ -13,8 +13,11 @@ const { ProductResolver } = require("./queries/product.resolver");
 const RootQuery = new GraphQLObjectType({
     name: "RootQuery",
     fields : {
+         //get all blogs
         blogs : BlogResolver,
+        //get all product
         products: ProductResolver,
+        //category query have two section :1- get the all parent category, 2-get the children of one category
         categories : CategoriesParentResolver,
         childOfCategory : CategoryChildResolver,
         courses : CourseResolver,

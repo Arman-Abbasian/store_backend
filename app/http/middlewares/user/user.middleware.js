@@ -1,6 +1,7 @@
 const createError = require("http-errors");
-const { UserModel } = require("../../../models/users");
 const JWT = require("jsonwebtoken");
+
+const { UserModel } = require("../../../models/users");
 const { ACCESS_TOKEN_SECRET_KEY } = require("../../../utils/constans");
 
 //check just =>exsitance of a bearer token
@@ -35,12 +36,14 @@ function VerifyAccessToken(req, res, next) {
 async function VerifyAccessTokenInGraphQL(req) {
   try {
     const token = getToken(req.headers);
+    //in latest vesion of jwt, you can write the function without callback function
     const { mobile } = JWT.verify(token, ACCESS_TOKEN_SECRET_KEY)
+    if (!mobile) throw new createError.Unauthorized("please login first")
     const user = await UserModel.findOne(
       { mobile },
       { password: 0, otp: 0 }
     );
-    if (!user) throw new createError.Unauthorized("حساب کاربری یافت نشد");
+    if (!user) throw new createError.Unauthorized("please login first");
     return user
   } catch (error) {
     throw new createError.Unauthorized()

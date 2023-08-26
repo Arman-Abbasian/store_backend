@@ -16,8 +16,6 @@ const CategoryChildResolver = {
     },
     resolve : async (_, args) => {
         const {parent} = args;
-        console.log(args)
-        console.log(parent)
         const categories = await CategoryModel.find({parent});
         return categories
     }
