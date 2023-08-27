@@ -56,8 +56,9 @@ function toObject(value){
     return null
 }
 async function checkExistCourse(id){
+    if(!mongoose.isValidObjectId(id)) throw createHttpError.BadGateway("course param is not true")
     const course =  await CourseModel.findById(id);
-    if(!course) throw createHttpError.NotFound("دوره ای با این مشخصات یافت نشد")
+    if(!course) throw createHttpError.NotFound("course not found")
     return course
 }
 //based on the id check :1- id is a mongoID , 2- the blog is existed in the blog collection or not

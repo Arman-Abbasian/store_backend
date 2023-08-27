@@ -104,7 +104,6 @@ const CreateCommentForProduct = {
             const commentDocument = await findParentComment(ProductModel, parent)
             //if the comment was not a parent comment(openToComment:false)
             if(commentDocument && !commentDocument?.openToComment) throw createHttpError.BadRequest("you can not register answer for this comment")
-            console.log("yesssssssss")
             const createAnswerResult = await ProductModel.updateOne({
                 _id: productID,
                 "comments._id": parent
@@ -161,10 +160,10 @@ const CreateCommentForCourse = {
         parent: {type: GraphQLString},
     },
     resolve : async (_, args, context) => {
-        const {req} = context;
+        try {
+            const {req} = context;
          const user = await VerifyAccessTokenInGraphQL(req)
         const {comment, courseID, parent} = args
-        if(!mongoose.isValidObjectId(courseID)) throw createHttpError.BadGateway("شناسه دوره ارسال شده صحیح نمیباشد")
         await checkExistCourse(courseID)
         if(parent && mongoose.isValidObjectId(parent)){
             //find the parent comment
@@ -184,16 +183,16 @@ const CreateCommentForCourse = {
                 }
             });
             if(!createAnswerResult.matchedCount && !createAnswerResult.modifiedCount) {
-                throw createHttpError.InternalServerError("ثبت پاسخ انجام نشد")
+                throw createHttpError.InternalServerError("server error")
             }
             return {
                 statusCode: HttpStatus.CREATED,
                 data : {
-                    message: "پاسخ شما با موفقیت ثبت شد"
+                    message: "answer registered successfully"
                 }
             }
         }else{
-            await CourseModel.updateOne({_id: courseID}, {
+          const createParentCommentResult = await CourseModel.updateOne({_id: courseID}, {
                 $push : {comments : {
                     comment, 
                     user: user._id, 
@@ -201,13 +200,20 @@ const CreateCommentForCourse = {
                     openToComment : true
                 }}
             })
-        }
-        return {
-            statusCode: HttpStatus.CREATED,
-            data : {
-                message: "ثبت نظر با موفقیت انجام شد پس از تایید در وبسایت قرار میگیرد"
+            if(!createParentCommentResult.modifiedCount) {
+                throw createHttpError.InternalServerError("server error")
+            }
+            return {
+                statusCode: HttpStatus.CREATED,
+                data : {
+                    message: "comment registered successfully"
+                }
             }
         }
+        } catch (error) {
+            throw createHttpError.BadRequest(error.message)
+        }
+       
     }
 }
 //find the parent comment
