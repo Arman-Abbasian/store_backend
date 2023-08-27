@@ -19,6 +19,7 @@ const ProductType = new GraphQLObjectType({
         title : {type : GraphQLString},
         short_text : {type : GraphQLString},
         text : {type : GraphQLString},
+        images : {type : new GraphQLList(GraphQLString)},
         imagesURL : {type : new GraphQLList(GraphQLString)},
         tags : {type : new GraphQLList(GraphQLString)},
         category : {type : PublicCategoryType},

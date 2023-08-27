@@ -60,9 +60,11 @@ async function checkExistCourse(id){
     if(!course) throw createHttpError.NotFound("دوره ای با این مشخصات یافت نشد")
     return course
 }
+//based on the id check :1- id is a mongoID , 2- the blog is existed in the blog collection or not
 async function checkExistProduct(id){
+    if(!mongoose.isValidObjectId(id)) throw createHttpError.BadGateway("product param is not true")
     const product =  await ProductModel.findById(id);
-    if(!product) throw createHttpError.NotFound("محصولی با این مشخصات یافت نشد")
+    if(!product) throw createHttpError.NotFound("product not found")
     return product
 }
 //based on the id check :1- id is a mongoID , 2- the blog is existed in the blog collection or not

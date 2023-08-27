@@ -9,10 +9,9 @@ mutation {
 }
 
 mutation {
-  CreateCommentForCourse(
+  CreateCommentForProduct(
     comment: "salam azizam", 
-    courseID: "62823134b7b2fdde58f8b6ca",
-  	parent: "62ac380fda9d7c2237cb39bc"
+    productID: "6279eaa4579ea4defa9e17a6"
   ){
     statusCode
     data
@@ -20,9 +19,10 @@ mutation {
 }
 
 mutation {
-  CreateCommentForProduct(
+  CreateCommentForCourse(
     comment: "salam azizam", 
-    productID: "6279eaa4579ea4defa9e17a6"
+    courseID: "62823134b7b2fdde58f8b6ca",
+  	parent: "62ac380fda9d7c2237cb39bc"
   ){
     statusCode
     data

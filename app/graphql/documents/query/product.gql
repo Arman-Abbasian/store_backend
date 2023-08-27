@@ -2,6 +2,7 @@
   products {
     _id
     title
+    images
     imagesURL
     short_text
     text

@@ -3,6 +3,7 @@ const { BlogModel } = require("../../models/blogs")
 const { BlogType } = require("../typeDefs/blog.type")
 
 const BlogResolver = {
+    // if a field do not exist in the BlogType we can use it in gql files
     type : new GraphQLList(BlogType),
     args : {
         category : {type : GraphQLString}

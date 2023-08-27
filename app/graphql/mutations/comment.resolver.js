@@ -34,6 +34,7 @@ const CreateCommentForBlog = {
             //if the comment was a answer comment (not a parent comment) so=> throw a error 
             if(commentDocument && !commentDocument?.openToComment) throw createHttpError.BadRequest("you can not answer to this comment")
             const createAnswerResult = await BlogModel.updateOne({
+                _id: blogID,
                 "comments._id": parent
             }, {
                 $push: {
@@ -72,7 +73,7 @@ const CreateCommentForBlog = {
             return {
                 statusCode: HttpStatus.CREATED,
                 data : {
-                    message:"comment added successfully"
+                    message:"comment registered successfully"
                 }
             }
         }
@@ -90,14 +91,20 @@ const CreateCommentForProduct = {
         parent: {type: GraphQLString},
     },
     resolve : async (_, args, context) => {
+       try {
         const {req} = context;
+        //check the token of user
          const user = await VerifyAccessTokenInGraphQL(req)
+         //get the params, queries, bodies and ... that client sent
         const {comment, productID, parent} = args
-        if(!mongoose.isValidObjectId(productID)) throw createHttpError.BadGateway("شناسه محصول ارسال شده صحیح نمیباشد")
+        //based on the blogId check :1- id is a mongoID , 2- the product is existed in the product collection or not
         await checkExistProduct(productID)
         if(parent && mongoose.isValidObjectId(parent)){
+            //find the parent comment of this comment (if the user sent a parent field to us)
             const commentDocument = await findParentComment(ProductModel, parent)
-            if(commentDocument && !commentDocument?.openToComment) throw createHttpError.BadRequest("ثبت پاسخ مجاز نیست")
+            //if the comment was not a parent comment(openToComment:false)
+            if(commentDocument && !commentDocument?.openToComment) throw createHttpError.BadRequest("you can not register answer for this comment")
+            console.log("yesssssssss")
             const createAnswerResult = await ProductModel.updateOne({
                 _id: productID,
                 "comments._id": parent
@@ -112,16 +119,16 @@ const CreateCommentForProduct = {
                 }
             });
             if(!createAnswerResult.modifiedCount) {
-                throw createHttpError.InternalServerError("ثبت پاسخ انجام نشد")
+                throw createHttpError.InternalServerError("server error")
             }
             return {
                 statusCode: HttpStatus.CREATED,
                 data : {
-                    message: "پاسخ شما با موفقیت ثبت شد"
+                    message: "answer registered successfully"
                 }
             }
         }else{
-            await ProductModel.updateOne({_id: productID}, {
+            const createParentCommentResult=await ProductModel.updateOne({_id: productID}, {
                 $push : {comments : {
                     comment, 
                     user: user._id, 
@@ -129,13 +136,21 @@ const CreateCommentForProduct = {
                     openToComment : true
                 }}
             })
-        }
-        return {
-            statusCode: HttpStatus.CREATED,
-            data : {
-                message: "ثبت نظر با موفقیت انجام شد پس از تایید در وبسایت قرار میگیرد"
+            if(!createParentCommentResult.modifiedCount) {
+                throw createHttpError.InternalServerError("server error")
+            }
+            return {
+                statusCode: HttpStatus.CREATED,
+                data : {
+                    message: "comment registered successfully"
+                }
             }
         }
+       } catch (error) {
+        console.log(error)
+        throw createHttpError.BadRequest(error.message)
+       }
+        
     }
 }
 const CreateCommentForCourse = {
@@ -200,9 +215,8 @@ async function findParentComment(model, id){
     //get parent comment field of the blog
     const findedComment =  await model.findOne({"comments._id": id},  {"comments.$" : 1});
     //make a copy of comment field
-    const comment = copyObject(findedComment)
-    if(!comment?.comments?.[0]) throw createHttpError.NotFound("parent comment not found")
-    return comment?.comments?.[0]
+    if(!findedComment?.comments?.[0]) throw createHttpError.NotFound("parent comment not found")
+    return findedComment?.comments?.[0]
 }
 module.exports = {
     CreateCommentForBlog,
