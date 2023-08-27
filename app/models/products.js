@@ -1,5 +1,5 @@
 const { default: mongoose } = require("mongoose");
-const { CommentSchema } = require("./public.schema");
+const { ParentCommentSchema } = require("./public.schema");
 const ProductSchema = new mongoose.Schema({
     title : {type: String,min:3,max:30, required : true},
     short_text : {type: String,min:5,max:60, required : true},
@@ -10,7 +10,7 @@ const ProductSchema = new mongoose.Schema({
     //category of product
     category : {type: mongoose.Types.ObjectId, ref: "category", required : true},
     //list of comments for this product
-    comments : {type: [CommentSchema], default : []},
+    comments : {type: [ParentCommentSchema], default : []},
     likes : {type: [mongoose.Types.ObjectId],ref:'user', default : []},
     dislikes : {type: [mongoose.Types.ObjectId],ref:'user', default : []},
     bookmarks : {type: [mongoose.Types.ObjectId],ref:'user', default : []},

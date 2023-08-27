@@ -1,7 +1,7 @@
 const { default: mongoose } = require("mongoose");
 
 const { getTimeOfCourse, getTimeOfChapter } = require("../utils/functions");
-const { CommentSchema } = require("./public.schema");
+const { ParentCommentSchema } = require("./public.schema");
 
 const EpisodeSchema = new mongoose.Schema({
     title: {type: String,min:3,max:30 ,required: true},
@@ -30,7 +30,7 @@ const CourseSchema = new mongoose.Schema({
     image : {type: String, required : true},
     tags : {type: [String], default : []},
     category : {type: mongoose.Types.ObjectId, ref: "category", required : true},
-    comments : {type: [CommentSchema], default : []},
+    comments : {type: [ParentCommentSchema], default : []},
     likes : {type: [mongoose.Types.ObjectId], ref: "user", default : []},
     dislikes : {type: [mongoose.Types.ObjectId], ref: "user", default : []},
     bookmarks : {type: [mongoose.Types.ObjectId], ref: "user", default : []},

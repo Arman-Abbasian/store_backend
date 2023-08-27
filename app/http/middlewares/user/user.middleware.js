@@ -6,6 +6,7 @@ const { ACCESS_TOKEN_SECRET_KEY } = require("../../../utils/constans");
 
 //check just =>exsitance of a bearer token
 function getToken(headers) {
+  if(!headers?.authorization) throw createError.Unauthorized("please login first");
   const [bearer, token] = headers?.authorization?.split(" ") || [];
   if (token && bearer.toLowerCase()==="bearer") return token;
   throw createError.Unauthorized("please login first");
@@ -46,7 +47,7 @@ async function VerifyAccessTokenInGraphQL(req) {
     if (!user) throw new createError.Unauthorized("please login first");
     return user
   } catch (error) {
-    throw new createError.Unauthorized()
+    throw new createError.Unauthorized(error.message)
   }
 }
 //authorized each route

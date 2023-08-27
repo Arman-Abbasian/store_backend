@@ -1,5 +1,5 @@
 const { default: mongoose } = require("mongoose");
-const { CommentSchema } = require("./public.schema");
+const { ParentCommentSchema } = require("./public.schema");
 const BlogSchema = new mongoose.Schema({
     //author of blog
     author : {type : mongoose.Types.ObjectId, ref: "user", required : true},
@@ -15,7 +15,7 @@ const BlogSchema = new mongoose.Schema({
     // category that related to the blog
     category : {type : mongoose.Types.ObjectId, ref: "category", required :true},
     //comments that the users add under a blog
-    comments : {type : [CommentSchema], default : []},
+    comments : {type : [ParentCommentSchema], default : []},
     //which users liked the blog
     likes : {type : [mongoose.Types.ObjectId], ref: "user", default : []},
     dislikes : {type : [mongoose.Types.ObjectId], ref: "user", default : []},

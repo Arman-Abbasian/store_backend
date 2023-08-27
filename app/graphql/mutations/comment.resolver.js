@@ -10,6 +10,7 @@ const { CourseModel } = require("../../models/courses");
 const { ProductModel } = require("../../models/products");
 const { checkExistCourse, checkExistProduct, checkExistBlog } = require("../utils");
 const { VerifyAccessTokenInGraphQL } = require("../../http/middlewares/user/user.middleware");
+
 const CreateCommentForBlog = {
     type: ResponseType,
     args : {
@@ -18,14 +19,20 @@ const CreateCommentForBlog = {
         parent: {type: GraphQLString},
     },
     resolve : async (_, args, context) => {
-        const {req} = context;
+        try {
+            const {req} = context;
+        //verify the user who want to register a comment
          const user = await VerifyAccessTokenInGraphQL(req)
+         //get the args that client sent
         const {comment, blogID, parent} = args
-        if(!mongoose.isValidObjectId(blogID)) throw createHttpError.BadGateway("شناسه بلاگ ارسال شده صحیح نمیباشد")
+        //based on the blogId check :1- id is a mongoID , 2- the blog is existed in the blog collection or not
         await checkExistBlog(blogID)
+        //if the user sent a valid parentID
         if(parent && mongoose.isValidObjectId(parent)){
-            const commentDocument = await getComment(BlogModel, parent)
-            if(commentDocument && !commentDocument?.openToComment) throw createHttpError.BadRequest("ثبت پاسخ مجاز نیست")
+            //find the parent comment of this comment (if the user sent a parent field to us)
+            const commentDocument = await findParentComment(BlogModel, parent)
+            //if the comment was a answer comment (not a parent comment) so=> throw a error 
+            if(commentDocument && !commentDocument?.openToComment) throw createHttpError.BadRequest("you can not answer to this comment")
             const createAnswerResult = await BlogModel.updateOne({
                 "comments._id": parent
             }, {
@@ -34,34 +41,44 @@ const CreateCommentForBlog = {
                         comment,
                         user: user._id,
                         show: false,
+                         //openToComment is false because this is a answer comment
                         openToComment: false
                     }
                 }
             });
             if(!createAnswerResult.modifiedCount) {
-                throw createHttpError.InternalServerError("ثبت پاسخ انجام نشد")
+                throw createHttpError.InternalServerError("server error")
             }
             return {
                 statusCode: HttpStatus.CREATED,
                 data : {
-                    message: "پاسخ شما با موفقیت ثبت شد"
+                    message: "answer registered successfully"
                 }
             }
+            //if the comment do not have a parent field(client do not sent parent field or valid parent)
         }else{
-            await BlogModel.updateOne({_id: blogID}, {
+            const createParentCommentResult = await BlogModel.updateOne({_id: blogID}, {
                 $push : {comments : {
                     comment, 
                     user: user._id, 
                     show : false,
+                    //openToComment is true because this is a parent comment
                     openToComment : true
                 }}
             })
-        }
-        return {
-            statusCode: HttpStatus.CREATED,
-            data : {
-                message: "ثبت نظر با موفقیت انجام شد پس از تایید در وبسایت قرار میگیرد"
+            if(!createParentCommentResult.modifiedCount) {
+                throw createHttpError.InternalServerError("server error")
             }
+            return {
+                statusCode: HttpStatus.CREATED,
+                data : {
+                    message:"comment added successfully"
+                }
+            }
+        }
+        
+        } catch (error) {
+            throw createHttpError(error.message)
         }
     }
 }
@@ -79,7 +96,7 @@ const CreateCommentForProduct = {
         if(!mongoose.isValidObjectId(productID)) throw createHttpError.BadGateway("شناسه محصول ارسال شده صحیح نمیباشد")
         await checkExistProduct(productID)
         if(parent && mongoose.isValidObjectId(parent)){
-            const commentDocument = await getComment(ProductModel, parent)
+            const commentDocument = await findParentComment(ProductModel, parent)
             if(commentDocument && !commentDocument?.openToComment) throw createHttpError.BadRequest("ثبت پاسخ مجاز نیست")
             const createAnswerResult = await ProductModel.updateOne({
                 _id: productID,
@@ -135,8 +152,10 @@ const CreateCommentForCourse = {
         if(!mongoose.isValidObjectId(courseID)) throw createHttpError.BadGateway("شناسه دوره ارسال شده صحیح نمیباشد")
         await checkExistCourse(courseID)
         if(parent && mongoose.isValidObjectId(parent)){
-            const commentDocument = await getComment(CourseModel, parent)
-            if(commentDocument && !commentDocument?.openToComment) throw createHttpError.BadRequest("ثبت پاسخ مجاز نیست")
+            //find the parent comment
+            const parentCommentDocument = await findParentComment(CourseModel, parent)
+            //if the comment was a answer comment (not a parent comment) so=> throw a error
+            if(!parentCommentDocument?.openToComment) throw createHttpError.BadRequest("you can not register answer for this comment")
             const createAnswerResult = await CourseModel.updateOne({
                 "comments._id": parent
             }, {
@@ -176,11 +195,13 @@ const CreateCommentForCourse = {
         }
     }
 }
-
-async function getComment(model, id){
+//find the parent comment
+async function findParentComment(model, id){
+    //get parent comment field of the blog
     const findedComment =  await model.findOne({"comments._id": id},  {"comments.$" : 1});
+    //make a copy of comment field
     const comment = copyObject(findedComment)
-    if(!comment?.comments?.[0]) throw createHttpError.NotFound("کامنتی با این مشخصات یافت نشد")
+    if(!comment?.comments?.[0]) throw createHttpError.NotFound("parent comment not found")
     return comment?.comments?.[0]
 }
 module.exports = {

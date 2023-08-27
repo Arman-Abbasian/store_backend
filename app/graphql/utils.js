@@ -3,6 +3,7 @@ const createHttpError = require("http-errors");
 const { BlogModel } = require("../models/blogs");
 const { CourseModel } = require("../models/courses");
 const { ProductModel } = require("../models/products");
+const { default: mongoose } = require("mongoose");
 
 //this section run when the type is equals to object
 function parseObject(valueNode) {
@@ -64,9 +65,11 @@ async function checkExistProduct(id){
     if(!product) throw createHttpError.NotFound("محصولی با این مشخصات یافت نشد")
     return product
 }
+//based on the id check :1- id is a mongoID , 2- the blog is existed in the blog collection or not
 async function checkExistBlog(id){
+    if(!mongoose.isValidObjectId(id)) throw createHttpError.BadGateway("blog param is not true")
     const blog =  await BlogModel.findById(id);
-    if(!blog) throw createHttpError.NotFound("بلاگی با این مشخصات یافت نشد")
+    if(!blog) throw createHttpError.NotFound("blog not found")
     return blog
 }
 
