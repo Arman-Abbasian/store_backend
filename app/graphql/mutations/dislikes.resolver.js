@@ -15,24 +15,32 @@ const DisLikeProduct = {
     },
     resolve : async (_, args, context) => {
         const {req} = context;
+        //authenticate the user
         const user = await VerifyAccessTokenInGraphQL(req)
+        //get the productID from param
         const {productID} = args
+        //chek if the productID is a true objectID und find the product in the product collection
         await checkExistProduct(productID)
+        //check if the user liked the product before
         let likedproduct = await ProductModel.findOne({
             _id: productID,
             likes : user._id
         })
+        //check if the user disliked the product before
         let disLikedproduct = await ProductModel.findOne({
             _id: productID,
             dislikes : user._id
         })
+        //if the user disliked product before=> put away the dislike 
+        //if the user did not dislike the product before =>dislike it
         const updateQuery = disLikedproduct? {$pull:{dislikes: user._id}} : {$push: {dislikes: user._id}}
         await ProductModel.updateOne({ _id: productID }, updateQuery)
         let message
+        //if user did not like the product so=>now like it so...
         if(!disLikedproduct){
             if(likedproduct) await ProductModel.updateOne({ _id: productID }, {$pull: {likes: user._id}})
-            message = "نپسندیدن محصول با موفقیت انجام شد"
-        } else message = "نپسندیدن محصول لغو شد"
+            message = "disliked successfully"
+        } else message = "disliked cancel successfully"
         return {
             statusCode: HttpStatus.CREATED,
             data : {
@@ -64,8 +72,8 @@ const DisLikeCourse = {
         let message;
         if(!disLikedCourse){
             if(likedcourse) await CourseModel.updateOne({ _id: courseID }, {$pull: {likes: user._id}})
-            message = "نپسندیدن دوره با موفقیت انجام شد"
-        } else message = "نپسندیدن دوره لغو شد"
+            message = "course disliked successfully"
+        } else message = "disliked course cancelled successfully"
         return {
             statusCode: HttpStatus.CREATED,
             data : {
@@ -97,8 +105,8 @@ const DisLikeBlog = {
         let message
         if(!disLikedBlog){
             if(likedBlog)await BlogModel.updateOne({ _id: blogID }, {$pull: {likes: user._id}})
-            message = "نپسندیدن مقاله با موفقیت انجام شد"
-        } else message = "نپسندیدن مقاله لغو شد"
+            message = "blog disliked successfully"
+        } else message = "disliked blog cancelled"
         return {
             statusCode: HttpStatus.CREATED,
             data : {
