@@ -14,19 +14,24 @@ const BookmarkProduct = {
     },
     resolve : async (_, args, context) => {
         const {req} = context;
+        //authenticate the user
         const user = await VerifyAccessTokenInGraphQL(req)
+        //get the product id from param
         const {productID} = args
+        //check if the productID is a mongoID and find the product in product collection
         await checkExistProduct(productID)
+        //check if the user bookmarked the product before
         let BookmarkedProduct = await ProductModel.findOne({
             _id: productID,
             bookmarks : user._id
         })
+        //if the user bookmarked the product before=>remove the bookmark and if not =>bookmark the product
         const updateQuery = BookmarkedProduct? {$pull:{bookmarks: user._id}} : {$push: {bookmarks: user._id}}
         await ProductModel.updateOne({ _id: productID }, updateQuery)
         let message
         if(!BookmarkedProduct){ 
-            message = "محصول به لیست علاقه مند های شما اضافه شد"
-        } else message = "محصول از لیست علاقه مندی های شما حذقف شد"
+            message = "product bookmarked"
+        } else message = "bookmarked product removed"
         return {
             statusCode: HttpStatus.CREATED,
             data : {
@@ -53,8 +58,8 @@ const BookmarkCourse = {
         await CourseModel.updateOne({ _id: courseID }, updateQuery)
         let message;
         if(!bookmarkedcourse){
-            message = "دوره به لیست علاقه مندی های شما اضافه شد"
-        } else message = "دوره از لیست علاقه مندی های شما حذف شد"
+            message = "course bookmarked"
+        } else message = "bookmarked course removed"
         return {
             statusCode: HttpStatus.OK,
             data : {
@@ -81,8 +86,8 @@ const BookmarkBlog = {
         await BlogModel.updateOne({ _id: blogID }, updateQuery)
         let message
         if(!bookmarkedBlog){
-            message = "مقاله به لیست علاقه مندی های شما اضافه شد"
-        } else message = "مقاله از لیست علاقه مندی های شما حذف شد"
+            message = "blog bookmarked"
+        } else message = "bookmarked blog removed"
         return {
             statusCode: HttpStatus.OK,
             data : {

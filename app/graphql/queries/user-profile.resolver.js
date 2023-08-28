@@ -23,7 +23,7 @@ const getUserBookmarkedBlogs = {
             {path: "likes"},
             {path: "dislikes"},
             {path: "bookmarks"},
-        ]);basket
+        ]);
         return blogs
     }
 }

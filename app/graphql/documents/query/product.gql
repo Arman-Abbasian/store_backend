@@ -1,4 +1,4 @@
-{
+query{
   products {
     _id
     title

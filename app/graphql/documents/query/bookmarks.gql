@@ -1,0 +1,154 @@
+query {
+  getUserBookmarkedProducts {
+    _id
+    title
+    images
+    imagesURL
+    short_text
+    text
+    tags
+    likes{
+      _id
+      first_name
+      last_name
+    }
+    dislikes{
+      _id
+      first_name
+      last_name
+    }
+    bookmarks{
+      _id
+      first_name
+      last_name
+    }
+    colors
+    supplier {
+      first_name
+      last_name
+    }
+    category {
+      title
+      _id
+    }
+    features {
+      height
+      width
+      weight
+      length
+    }
+    comments {
+      _id
+      comment
+      user {
+        first_name
+        last_name
+      }
+      answers{
+        _id
+        comment
+        user{
+          first_name
+          last_name
+        }
+      }
+    }
+  }
+}
+
+query {
+  getUserBookmarkedCourses {
+   _id
+    title
+    text
+    imageURL
+    short_text
+    price
+    discount
+    likes{
+      _id
+      first_name
+      last_name
+    }
+    dislikes{
+      _id
+      first_name
+      last_name
+    }
+    bookmarks{
+      _id
+      first_name
+      last_name
+    }
+    coursetotalTime
+    category {
+      _id
+      title
+    }
+    teacher {
+      first_name
+      last_name
+    }
+    chapters {
+      title
+      chaptertotalTime
+      episodes {
+        title
+        time
+      }
+    }
+    comments {
+      _id
+      comment
+      user {
+        first_name
+        last_name
+      }
+      answers{
+        _id
+        comment
+        user{
+          first_name
+          last_name
+        }
+      }
+    }
+    }
+
+}
+
+query {
+  getUserBookmarkedBlogs {
+    _id
+    title
+    imageURL
+    short_text
+    text
+  	comments {
+      comment
+      openToComment
+      createdAt
+      user {
+      	first_name
+        last_name
+    	}
+      answers{
+       comment
+        user{
+          first_name
+          last_name
+        }
+        createdAt
+      }
+    }
+    author {
+      first_name
+      last_name
+    }
+    category {
+      title
+      _id
+    }
+    }
+
+}
