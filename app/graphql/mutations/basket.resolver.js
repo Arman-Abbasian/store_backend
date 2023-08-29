@@ -108,14 +108,19 @@ const RemoveProductFromBasket = {
     },
     resolve : async (_, args, context) => {
         const {req} = context;
+        //authenticate the user with user token in header
         const user = await VerifyAccessTokenInGraphQL(req)
+        //get the productID from client in param
         const {productID} = args
+        //check if the productID is a valid mongoID and if the product existed in the product collection or not
         await checkExistProduct(productID)
+        //check if the product existed before in the basket or not
         const product = await findProductInBasket(user._id, productID)
         let message;
-        if(!product) throw createHttpError.NotFound("محصول مورد نظر در سبد خرید یافت نشد")
+        if(!product) throw createHttpError.NotFound("product not existed in the basket")
+        //if the count for product in basket was bigger than one => reduce count 1
         if(product.count > 1){
-            await UserModel.updateOne(
+           const reduceOneFromProductCount= await UserModel.updateOne(
                 {
                 _id: user._id,
                 "basket.products.productID" : productID
@@ -126,9 +131,11 @@ const RemoveProductFromBasket = {
                     }
                 }
             )
-            message = "یک عدد از محصول داخل سبد خرید کم شد"
+            if(!reduceOneFromProductCount.modifiedCount) throw createHttpError.InternalServerError("server error")
+            message = "product reduce 1"
+        //if the number of the product in basket was 1 => remove the product form basket
         }else{
-            await UserModel.updateOne(
+           const removedProductFromBasket= await UserModel.updateOne(
                 {
                     _id: user._id,
                     "basket.products.productID" : productID
@@ -141,7 +148,8 @@ const RemoveProductFromBasket = {
                     }
                 }
                 )
-                message = "محصول در داخل سبد خرید حذف شد"
+                if(!removedProductFromBasket.modifiedCount) throw createHttpError.InternalServerError("server error")
+                message = "product removed from basket"
         }
         return {
             statusCode: HttpStatus.OK,
@@ -202,10 +210,14 @@ const RemoveCourseFromBasket = {
         }
     }
 }
+//this function return the product if that was before in the basket=> {
+//      productID: '64d29431903cfcac3e131a57',
+//      count: 2,
+//    }
 async function findProductInBasket(userID, productID){
     const findResult = await UserModel.findOne({_id: userID, "basket.products.productID": productID}, {"basket.products.$": 1})
     const userDetail = copyObject(findResult);
-    console.log(userDetail)
+    console.log(userDetail?.basket)
     return userDetail?.basket?.products?.[0]
 }
 async function findCourseInBasket(userID, courseID){
