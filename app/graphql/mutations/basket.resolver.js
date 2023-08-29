@@ -15,12 +15,18 @@ const AddProductToBasket = {
     },
     resolve : async (_, args, context) => {
         const {req} = context;
+        //authenticate the user with their token in header=> req.header
         const user = await VerifyAccessTokenInGraphQL(req)
+        //get the productID in params
         const {productID} = args
+        //check 1- if the product id is a valid mongoID , 2- existance of product in product collection
         await checkExistProduct(productID)
+        //check if the product existed in basket before or not
         const product = await findProductInBasket(user._id, productID)
+        let message;
+        //if product existed befor in basket =>add one to it's count
         if(product){
-            await UserModel.updateOne(
+           const addOneProduct= await UserModel.updateOne(
                 {
                 _id: user._id,
                 "basket.products.productID" : productID
@@ -31,8 +37,11 @@ const AddProductToBasket = {
                     }
                 }
             )
+            if (!addOneProduct.modifiedCount) throw createHttpError.InternalServerError("server error")
+            message="one product added"
+            //if product not existed before in basket =>add product to basket
         }else{
-            await UserModel.updateOne(
+          const addProductToBasket=  await UserModel.updateOne(
                 {
                 _id: user._id
                 },
@@ -45,11 +54,13 @@ const AddProductToBasket = {
                     }
                 }
             )
+            if (!addProductToBasket.modifiedCount) throw createHttpError.InternalServerError("server error")
+            message="product added to basket"
         }
         return {
             statusCode: HttpStatus.OK,
             data: {
-                message: "محصول به سبد خرید افزوده شد"
+                message
             }
         }
     }
@@ -194,6 +205,7 @@ const RemoveCourseFromBasket = {
 async function findProductInBasket(userID, productID){
     const findResult = await UserModel.findOne({_id: userID, "basket.products.productID": productID}, {"basket.products.$": 1})
     const userDetail = copyObject(findResult);
+    console.log(userDetail)
     return userDetail?.basket?.products?.[0]
 }
 async function findCourseInBasket(userID, courseID){

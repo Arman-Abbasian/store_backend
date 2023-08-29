@@ -1,13 +1,19 @@
 const { ref } = require("@hapi/joi/lib/compile");
 const { default: mongoose } = require("mongoose");
+//product schema means =>{productID:148745f1gr474,count:4}
 const ProductSchema = new mongoose.Schema({
     productID: {type: mongoose.Types.ObjectId, ref: "product"},
     count: {type: Number, default: 1}
 })
+//course schema means =>{courseID:148745f1gr474,count:1} *the course can have just count:1
 const CourseSchema = new mongoose.Schema({
     courseID: {type: mongoose.Types.ObjectId, ref: "course"},
     count: {type: Number, default: 1}
 })
+//Basket schema means => {
+//    courses:[{productID:148745f1gr474,count:4},{productID:147745f1gr47o,count:3}],
+//    products:[{courseID:148745f1gr474,count:1},{courseID:147745f1gr47o,count:1}]
+//    }
 const BasketSchema = new mongoose.Schema({
     courses: {type: [CourseSchema], default: []},
     products: {type: [ProductSchema], default: []},
