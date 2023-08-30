@@ -35,8 +35,10 @@ const CourseSchema = new mongoose.Schema({
     dislikes : {type: [mongoose.Types.ObjectId], ref: "user", default : []},
     bookmarks : {type: [mongoose.Types.ObjectId], ref: "user", default : []},
     price : {type: Number, default : 0},
-    discountedPrice : {type: Number, default : 0},
     discount : {type: Number, default : 0},
+    discountedPrice:{type: Number, default : function(){ 
+        return (this.price * (1-(this.discount / 100)))}
+    },
     type : {type: String, default: "free"/*free, cash, special */, required : true},
     status: {type: String, default: "notStarted" /*notStarted, Completed, Holding*/},
     //teacher is equal to owner in product schema
