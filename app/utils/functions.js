@@ -332,6 +332,12 @@ async function getBasketOfUser(userID, discount = {}){
                     }
                 },
                 //add an other field with the name "payDetail"
+               // this filed is a object and have three key=>
+               //1-courseAmount =>total cost of all course in basket
+               //2-productAmount=> total cost of all product in basket 
+               //3-paymentAmount=> total cost of all in basket (products + courses)
+               //4-productIds => id of all courses in basket=> use for add to products field in UserModel after pay
+               //4-courseIds => id of all courses in basket=> use for add to courses field in UserModel after pay
                 "payDetail" : {
                     $function: {
                         body: function(courseDetail, productDetail, products){

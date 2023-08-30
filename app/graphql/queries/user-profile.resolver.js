@@ -62,6 +62,8 @@ const getUserBookmarkedCourses = {
 }
 //in graphql like the restfull API we do not have the middlewares and have to do all checks, validations,
 //search in db and ... in resolve section completely
+
+//this quetry get the badket of user and make some changes on it and add some field to it
 const getUserBasket = {
     type : AnyType,
     resolve : async (_, args, context) => {

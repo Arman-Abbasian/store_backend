@@ -16,6 +16,9 @@ const ProductSchema = new mongoose.Schema({
     bookmarks : {type: [mongoose.Types.ObjectId],ref:'user', default : []},
     price : {type: Number, default : 0},
     discount : {type: Number, default : 0},
+    discountedPrice:{type: Number, default : function(){ 
+        return (this.price * (1-(this.discount / 100)))}
+    },
     //number of this product in store
     count : {type: Number},
     type : {type: String, required : true}, //virtual - physical
