@@ -8,6 +8,7 @@ const { checkExistCourse, checkExistProduct } = require("../utils");
 const { UserModel } = require("../../models/users");
 const { copyObject } = require("../../utils/functions");
 const createHttpError = require("http-errors");
+
 const AddProductToBasket = {
     type: ResponseType,
     args : {
@@ -75,9 +76,15 @@ const AddCourseToBasket = {
         const user = await VerifyAccessTokenInGraphQL(req)
         const {courseID} = args
         await checkExistCourse(courseID)
+         // we must check the existence of course in two level:
+        //1-check the existence of course in the Courses field in userModel(means user bought this course before and pay it)
+        const userCourse = await UserModel.findOne({_id: user._id, Courses: courseID})
+        if(userCourse) throw new createHttpError.BadRequest("you bought this course before")
         const course = await findCourseInBasket(user._id, courseID)
+        //2-if the course was already in your basket => throw a error
         if(course){
-            throw createHttpError.BadRequest("این دوره قبلا به سبد خرید اضافه شده")
+            throw createHttpError.BadRequest("this course existed already in your basket")
+            //if the course was not already in your basket => add the course to the basket
         }else{
             await UserModel.updateOne(
                 {
@@ -96,7 +103,7 @@ const AddCourseToBasket = {
         return {
             statusCode: HttpStatus.OK,
             data: {
-                message: "دوره به سبد خرید افزوده شد"
+                message: "course added to basket"
             }
         }
     }
@@ -168,25 +175,11 @@ const RemoveCourseFromBasket = {
         const {req} = context;
         const user = await VerifyAccessTokenInGraphQL(req)
         const {courseID} = args
+        //check if we have this course in course collection or not
         await checkExistCourse(courseID)
-        const userCourse = await UserModel.findOne({_id: user._id, Courses: courseID})
-        if(userCourse) throw new createHttpError.BadRequest("شما این دوره رو قبلا خریداری کردید")
+        //check if the course existed in basket or not
         const course = await findCourseInBasket(user._id, courseID)
-        if(!course) throw createHttpError.NotFound("دوره مورد نظزر در داخل سبد خرید یافت نشد")
-        if(course.count > 1){
-            await UserModel.updateOne(
-                {
-                _id: user._id,
-                "basket.courses.courseID" : courseID
-                },
-                {   
-                    $inc: {
-                        "basket.courses.$.count": -1
-                    }
-                }
-            )
-            message = "یک عدد از دوره داخل سبد خرید کم شد"
-        }else{
+        if(!course) throw createHttpError.NotFound("course was not in basket")
             await UserModel.updateOne(
                 {
                 _id: user._id,
@@ -200,8 +193,8 @@ const RemoveCourseFromBasket = {
                     }
                 }
             )
-            message = "دوره در داخل سبد خرید حذف شد"
-        }
+            message = "course removed from basket"
+        
         return {
             statusCode: HttpStatus.OK,
             data: {
@@ -220,6 +213,10 @@ async function findProductInBasket(userID, productID){
     console.log(userDetail?.basket)
     return userDetail?.basket?.products?.[0]
 }
+//this function return the course if that was before in the basket=> {
+//      courseID: '64d29431903cfcac3e131a57',
+//      count: 2,
+//    }
 async function findCourseInBasket(userID, courseID){
     const findResult = await UserModel.findOne({_id: userID, "basket.courses.courseID": courseID}, {"basket.courses.$": 1})
     const userDetail = copyObject(findResult);

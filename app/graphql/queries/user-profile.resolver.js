@@ -66,6 +66,7 @@ const getUserBasket = {
     type : AnyType,
     resolve : async (_, args, context) => {
         const {req} = context;
+        // authenticate the user
         const user = await VerifyAccessTokenInGraphQL(req)
         const userDetail = await getBasketOfUser(user._id)
         return userDetail

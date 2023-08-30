@@ -256,13 +256,20 @@ function invoiceNumberGenerator(){
     return moment().format("jYYYYjMMjDDHHmmssSSS") + String(process.hrtime()[1]).padStart(9, 0)
 }
 async function getBasketOfUser(userID, discount = {}){
+    //find the user in User collection
     const userDetail = await UserModel.aggregate([
+        //find the user the it's id match the _id  field in user collection
         {
             $match : { _id: userID }
         },
+        //from the user fields just return basket field
         {
             $project:{ basket: 1}
         },
+        //when we make a lookup=> we want to add new field to collection(here is  "productDetail" field)
+        //tip=> $lookup add a array field to your fields
+        //under code means=> from the products collection find the item that _id of that product is equal to
+        // productID field in basket.product section(in summary => we want add product infos instead of productID)
         {
             $lookup: {
                 from: "products",
@@ -271,6 +278,7 @@ async function getBasketOfUser(userID, discount = {}){
                 as: "productDetail"
             }
         },
+        //this section in same with upon section just for courses
         {
             $lookup: {
                 from: "courses",
@@ -279,14 +287,22 @@ async function getBasketOfUser(userID, discount = {}){
                 as: "courseDetail"
             }
         },
+        //here we want to add a field to the productDetail section(we made the productDetail with !lookup)
         {
             $addFields : {
                 "productDetail" : {
-                    $function: {
+                    $function: {  
                         body: function(productDetail, products){
+                            //map on productDetail(that is a array=>because we make it with lookup) and for each product...
                             return productDetail.map(function(product){
+                                //=> find in the products in basket=> the product that it's productID is equals to _id of the
+                                //product (that we mapped on that) => when find that product in basket.product
+                                //=> then get the count field of that product
+                                // *** when we want to compare two mongoID=> we should compare value of that fields
                                 const count = products.find(item => item.productID.valueOf() == product._id.valueOf()).count;
                                 const totalPrice = count * product.price
+                                //add three field to each productDetail element
+                                //1-basketCount(number of that product in the basket), 2-totalprice, 3-finalPrice
                                 return {
                                     ...product,
                                     basketCount: count,
@@ -299,10 +315,12 @@ async function getBasketOfUser(userID, discount = {}){
                         lang: "js"
                     }
                 },
+                //in course Detail we do like productDetail=> just we do not have count and all count is 1
                 "courseDetail" : {
                     $function: {
                         body: function(courseDetail){
                             return courseDetail.map(function(course){
+                                 // => because we do not have count in course so=> we do not nees to totalPrice and basketCount fields
                                 return {
                                     ...course,
                                     finalPrice: course.price - ((course.discount / 100) * course.price)
@@ -313,12 +331,15 @@ async function getBasketOfUser(userID, discount = {}){
                         lang: "js"
                     }
                 },
+                //add an other field with the name "payDetail"
                 "payDetail" : {
                     $function: {
                         body: function(courseDetail, productDetail, products){
+                            //cost of all courses in basket
                             const courseAmount =  courseDetail.reduce(function(total, course){
                                 return total + (course.price - ((course.discount / 100) * course.price))
                             }, 0)
+                            //cost of all products in basket
                             const productAmount =  productDetail.reduce(function(total, product){
                                 const count = products.find(item => item.productID.valueOf() == product._id.valueOf()).count
                                 const totalPrice = count * product.price;
@@ -340,6 +361,7 @@ async function getBasketOfUser(userID, discount = {}){
                 },
             }
         },{
+            //do not show the basket (just show productDetail and courseDetail)
             $project: {
                 basket: 0
             }
