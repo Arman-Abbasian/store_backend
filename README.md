@@ -14,4 +14,12 @@
 <p width="960" style="padding-right:40px;" align="left" >@hapi/joi</p>
 
 # summary of project
-In this project i worked on a inventory management app in three section. 1- inventory management of spare parts and equipment, 2- inventory management of products section , 3- managing the purchase and delivery section. i try to simulate all CRUD operation in this project and validation the forms with Yup and Formik. 
+In this project i worked on a full backend project. this project is about a Online shop that sale real and virtual products. so i developed two model for product: 1-virtual products, 2-real products.
+here i try to use from 1-restfull API and 2- Graphql, i mean for some routes i used from Restfull API and for some routes form Graphql.
+I use from RBAC to authorized the routes and used from JWT to authenticate the user
+to document APIs in Restfull API i used from swagger
+and i use quries and mutation both to consider and use graphql in project
+i used from multer package to uplaod images.
+All models developed based on the real project.
+we can put comments, add videos for courses(virtual products), add images, likes blogs and products, bookmarks blogs and products, add , delete or update one Prodcts and ...
+
